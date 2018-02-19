@@ -33,6 +33,5 @@ lint :
 
 	# Run package-lint to check for packaging mistakes
 	$(BATCH) \
-	--eval "(require 'package)" \
 	--eval "(require 'package-lint)" \
 	-f package-lint-batch-and-exit ${SRCS}
