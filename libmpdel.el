@@ -667,14 +667,20 @@ If HANDLER is nil, ignore response."
 (cl-defmethod libmpdel-playlist-add ((stored-playlist libmpdel-stored-playlist) (_ libmpdel-current-playlist))
   (libmpdel-send-command `("load %S" ,(libmpdel-entity-name stored-playlist))))
 
-(defun libmpdel-playlist-replace (entity)
-  "Clear current playlist and add ENTITY to it."
-  (libmpdel-playlist-clear)
-  (libmpdel-playlist-add entity (libmpdel-current-playlist)))
+(defun libmpdel-playlist-replace (entity &optional playlist)
+  "Clear PLAYLIST and add ENTITY to it.
+If PLAYLIST is nil, use the current one."
+  (libmpdel-playlist-clear playlist)
+  (libmpdel-playlist-add entity playlist))
 
-(defun libmpdel-playlist-clear ()
-  "Remove all songs from current playlist."
+(cl-defgeneric libmpdel-playlist-clear (playlist)
+  "Remove all songs from PLAYLIST.")
+
+(cl-defmethod libmpdel-playlist-clear ((_ libmpdel-current-playlist))
   (libmpdel-send-command "clear"))
+
+(cl-defmethod libmpdel-playlist-clear ((playlist libmpdel-stored-playlist))
+  (libmpdel-send-command `("playlistclear %S" ,(libmpdel-entity-name playlist))))
 
 (cl-defgeneric libmpdel-playlist-delete (songs playlist)
   "Remove SONGS from PLAYLIST.")
