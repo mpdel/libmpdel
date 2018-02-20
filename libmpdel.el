@@ -486,6 +486,25 @@ Transform each entity to a string with TRANSFORMER,
     (let ((entity-string (completing-read prompt entity-strings nil t)))
       (gethash entity-string map))))
 
+(defun libmpdel-completing-read-entity (function prompt entity &optional transformer)
+  "Call FUNCTION after prompting for an element of ENTITY.
+
+Pass PROMPT, the elements of ENTITY and TRANSFORMER to
+`libmpdel-completing-read'."
+  (libmpdel-list
+   entity
+   (lambda (entities)
+     (funcall function
+              (libmpdel-completing-read prompt entities transformer)))))
+
+(defun libmpdel-funcall-on-stored-playlist (function)
+  "Pass a stored playlist as parameter to FUNCTION.
+The user is asked to choose for a stored playlist first."
+  (libmpdel-completing-read-entity
+   function
+   "Stored playlist: "
+   'stored-playlists))
+
 
 ;;; Public functions
 
@@ -584,8 +603,7 @@ If HANDLER is nil, ignore response."
 (cl-defgeneric libmpdel-list (object function)
   "Call FUNCTION with all entries matching OBJECT.")
 
-(defun libmpdel-list-artists (function)
-  "Call FUNCTION with all artists as parameters."
+(cl-defmethod libmpdel-list ((_object (eql artists)) function)
   (libmpdel-send-command
    "list artist"
    (lambda (data)
@@ -594,7 +612,7 @@ If HANDLER is nil, ignore response."
                (lambda (artist-name) (libmpdel--artist-create :name artist-name))
                (libmpdel-sorted-entries data 'Artist))))))
 
-(defun libmpdel-list-stored-playlists (function)
+(cl-defmethod libmpdel-list ((_object (eql stored-playlists)) function)
   "Call FUNCTION with all stored playlists as parameters."
   (libmpdel-send-command
    "listplaylists"
@@ -649,14 +667,20 @@ If HANDLER is nil, ignore response."
 (cl-defmethod libmpdel-playlist-add ((stored-playlist libmpdel-stored-playlist) (_ libmpdel-current-playlist))
   (libmpdel-send-command `("load %S" ,(libmpdel-entity-name stored-playlist))))
 
-(defun libmpdel-playlist-replace (entity)
-  "Clear current playlist and add ENTITY to it."
-  (libmpdel-playlist-clear)
-  (libmpdel-playlist-add entity (libmpdel-current-playlist)))
+(defun libmpdel-playlist-replace (entity &optional playlist)
+  "Clear PLAYLIST and add ENTITY to it.
+If PLAYLIST is nil, use the current one."
+  (libmpdel-playlist-clear playlist)
+  (libmpdel-playlist-add entity playlist))
 
-(defun libmpdel-playlist-clear ()
-  "Remove all songs from current playlist."
+(cl-defgeneric libmpdel-playlist-clear (playlist)
+  "Remove all songs from PLAYLIST.")
+
+(cl-defmethod libmpdel-playlist-clear ((_ libmpdel-current-playlist))
   (libmpdel-send-command "clear"))
+
+(cl-defmethod libmpdel-playlist-clear ((playlist libmpdel-stored-playlist))
+  (libmpdel-send-command `("playlistclear %S" ,(libmpdel-entity-name playlist))))
 
 (cl-defgeneric libmpdel-playlist-delete (songs playlist)
   "Remove SONGS from PLAYLIST.")
