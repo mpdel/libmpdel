@@ -486,6 +486,25 @@ Transform each entity to a string with TRANSFORMER,
     (let ((entity-string (completing-read prompt entity-strings nil t)))
       (gethash entity-string map))))
 
+(defun libmpdel-completing-read-entity (function prompt entity &optional transformer)
+  "Call FUNCTION after prompting for an element of ENTITY.
+
+Pass PROMPT, the elements of ENTITY and TRANSFORMER to
+`libmpdel-completing-read'."
+  (libmpdel-list
+   entity
+   (lambda (entities)
+     (funcall function
+              (libmpdel-completing-read prompt entities transformer)))))
+
+(defun libmpdel-funcall-on-stored-playlist (function)
+  "Pass a stored playlist as parameter to FUNCTION.
+The user is asked to choose for a stored playlist first."
+  (libmpdel-completing-read-entity
+   function
+   "Stored playlist: "
+   'stored-playlists))
+
 
 ;;; Public functions
 
