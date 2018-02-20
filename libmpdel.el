@@ -584,8 +584,7 @@ If HANDLER is nil, ignore response."
 (cl-defgeneric libmpdel-list (object function)
   "Call FUNCTION with all entries matching OBJECT.")
 
-(defun libmpdel-list-artists (function)
-  "Call FUNCTION with all artists as parameters."
+(cl-defmethod libmpdel-list ((_object (eql artists)) function)
   (libmpdel-send-command
    "list artist"
    (lambda (data)
@@ -594,7 +593,7 @@ If HANDLER is nil, ignore response."
                (lambda (artist-name) (libmpdel--artist-create :name artist-name))
                (libmpdel-sorted-entries data 'Artist))))))
 
-(defun libmpdel-list-stored-playlists (function)
+(cl-defmethod libmpdel-list ((_object (eql stored-playlists)) function)
   "Call FUNCTION with all stored playlists as parameters."
   (libmpdel-send-command
    "listplaylists"
