@@ -505,6 +505,26 @@ The user is asked to choose for a stored playlist first."
    "Stored playlist: "
    'stored-playlists))
 
+(defun libmpdel-current-playlist-add (entity)
+  "Add ENTITY to a current playlist."
+  (libmpdel-playlist-add entity (libmpdel-current-playlist)))
+
+(defun libmpdel-current-playlist-replace (entity)
+  "Replace current playlist with ENTITY."
+  (libmpdel-playlist-replace entity (libmpdel-current-playlist)))
+
+(defun libmpdel-stored-playlist-add (entity)
+  "Add ENTITY to a stored playlist.
+The user is asked to choose for a stored playlist first."
+  (libmpdel-funcall-on-stored-playlist
+   (apply-partially #'libmpdel-playlist-add entity)))
+
+(defun libmpdel-stored-playlist-replace (entity)
+  "Replace a stored playlist with ENTITY.
+The user is asked to choose for a stored playlist first."
+  (libmpdel-funcall-on-stored-playlist
+   (apply-partially #'libmpdel-playlist-replace entity)))
+
 
 ;;; Public functions
 
