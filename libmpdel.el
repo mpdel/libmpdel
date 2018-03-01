@@ -23,7 +23,8 @@
 
 ;;; Commentary:
 
-;; libmpdel provides the core feature
+;; libmpdel provides the core feature to communicate with an MPD
+;; server.  A user interface is provided by the mpdel package.
 
 ;;; Code:
 (require 'time-stamp)

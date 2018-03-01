@@ -1,0 +1,34 @@
+* libmpdel
+
+** Summary
+
+The package libmpdel is an Emacs library client to communicate with
+[[https://www.musicpd.org/][Music Player Daemon]] (MPD), a flexible, powerful, server-side
+application for playing music. For a user interface, please check the
+[[https://gitlab.petton.fr/mpdel/mpdel][mpdel]] project instead (which depends on this one).
+
+** Installing
+
+Clone this git repository and [[https://gitlab.petton.fr/mpdel/libmpdel][libmpdel]]. I will ask to get libmpdel
+inside [[http://melpa.org/][melpa]] to facilitate installation.
+
+You need to install and (quickly) configure an [[https://www.musicpd.org/][MPD server]] if you don't
+have any yet. Don't worry, that's simple and you won't regret it.
+
+** Usage
+
+The source code is well documented and organized in sections. Please
+have a look at it. I should write a proper package documentation but
+haven't done that yet.
+
+** License
+
+See [[file:COPYING][COPYING]]. Copyright (c) 2018 Damien Cassou.
+
+  #+BEGIN_HTML
+  <a href="https://liberapay.com/DamienCassou/donate">
+    <img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg">
+  </a>
+  #+END_HTML
+
+#  LocalWords:  MPDel MPD minibuffer
