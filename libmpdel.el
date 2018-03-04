@@ -23,8 +23,10 @@
 
 ;;; Commentary:
 
-;; libmpdel provides the core feature to communicate with an MPD
-;; server.  A user interface is provided by the mpdel package.
+;; The package libmpdel is an Emacs library client to communicate with
+;; Music Player Daemon (MPD), a flexible, powerful, server-side
+;; application for playing music.  For a user interface, please check
+;; the mpdel project instead (which depends on this one).
 
 ;;; Code:
 (require 'time-stamp)
