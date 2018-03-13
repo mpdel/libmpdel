@@ -1,22 +1,24 @@
 SRCS = libmpdel.el
 TESTS = test/libmpdel-test.el
 
-LOAD_PATH = -L .
-
-LOAD_PATH += -L ../package-lint
+LOAD_PATH = -L . -L ../package-lint
 
 EMACSBIN ?= emacs
-BATCH     = $(EMACSBIN) -Q --batch $(LOAD_PATH) --eval "(setq load-prefer-newer t)"
+BATCH     = $(EMACSBIN) -Q --batch $(LOAD_PATH) \
+		--eval "(setq load-prefer-newer t)" \
+		--eval "(require 'package)" \
+		--eval "(add-to-list 'package-archives '(\"melpa-stable\" . \"http://stable.melpa.org/packages/\"))" \
+		--funcall package-initialize
 
 .PHONY: all ci-dependencies check test lint
-
-CURL = curl -fsSkL --retry 9 --retry-delay 9
-GITHUB=https://raw.githubusercontent.com
 
 all: check
 
 ci-dependencies:
-	$(CURL) -O ${GITHUB}/purcell/package-lint/master/package-lint.el
+	# Install dependencies in ~/.emacs.d/elpa
+	$(BATCH) \
+	--funcall package-refresh-contents \
+	--eval "(package-install 'package-lint)"
 
 check: test lint
 
