@@ -30,8 +30,8 @@ application for playing music. For a user interface, please check the
 
 ** Installing
 
-Clone this git repository and [[https://gitlab.petton.fr/mpdel/libmpdel][libmpdel]]. I will ask to get libmpdel
-inside [[http://melpa.org/][melpa]] to facilitate installation.
+Get libmpdel from [[https://melpa.org/#/libmpdel][melpa]] or [[https://stable.melpa.org/#/libmpdel][melpa stable]]. You can also clone the git
+repository.
 
 You need to install and (quickly) configure an [[https://www.musicpd.org/][MPD server]] if you don't
 have any yet. Don't worry, that's simple and you won't regret it.
