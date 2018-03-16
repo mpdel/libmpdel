@@ -157,6 +157,12 @@ message from the server.")
                (:constructor libmpdel--current-playlist-create)
                (:conc-name libmpdel--current-playlist-)))
 
+(cl-defstruct (libmpdel-search-criteria
+               (:constructor libmpdel-search-criteria-create)
+               (:conc-name libmpdel--search-criteria-))
+  (type nil :read-only t)
+  (what nil :read-only t))
+
 (defun libmpdel-current-playlist ()
   "Return the current playlist."
   (libmpdel--current-playlist-create))
@@ -644,6 +650,14 @@ If HANDLER is nil, ignore response."
               (mapcar
                (lambda (playlist-name) (libmpdel--stored-playlist-create :name playlist-name))
                (libmpdel-sorted-entries data 'playlist))))))
+
+(cl-defmethod libmpdel-list ((search-criteria libmpdel-search-criteria) function)
+  (libmpdel-send-command
+   `("search %s %S"
+     ,(libmpdel--search-criteria-type search-criteria)
+     ,(libmpdel--search-criteria-what search-criteria))
+   (lambda (data)
+     (funcall function (libmpdel--create-songs-from-data data)))))
 
 (cl-defmethod libmpdel-list ((artist libmpdel-artist) function)
   (libmpdel-send-command
