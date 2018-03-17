@@ -718,6 +718,7 @@ If HANDLER is nil, ignore response."
      ,(libmpdel-entity-to-criteria entity))))
 
 (cl-defmethod libmpdel-playlist-add ((stored-playlist libmpdel-stored-playlist) (_ libmpdel-current-playlist))
+  "Add content of STORED-PLAYLIST to the current playlist."
   (libmpdel-send-command `("load %S" ,(libmpdel-entity-name stored-playlist))))
 
 (defun libmpdel-playlist-replace (entity &optional playlist)
