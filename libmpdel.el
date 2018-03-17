@@ -240,6 +240,15 @@ message from the server.")
 (cl-defmethod libmpdel-entity-parent ((_stored-playlist libmpdel-stored-playlist))
   'stored-playlists)
 
+(cl-defgeneric libmpdel-entity-id (entity)
+  "Return an identifier string for ENTITY."
+  entity)
+
+(cl-defmethod libmpdel-entity-id ((song libmpdel-song))
+  ;; Override of default implementation to ignore changing ids and
+  ;; position.
+  (libmpdel--song-file song))
+
 (defun libmpdel-song-file (song)
   "Return the filename of SONG."
   (libmpdel--song-file song))
@@ -622,6 +631,10 @@ If HANDLER is nil, ignore response."
 (cl-defmethod libmpdel-dired ((song libmpdel-song))
   (require 'dired-x)
   (dired-jump t (expand-file-name (libmpdel-song-file song) libmpdel-music-directory)))
+
+(defun libmpdel-equal (entity1 entity2)
+  "Return non-nil if ENTITY1 and ENTITY2 represent the same entity."
+  (equal (libmpdel-entity-id entity1) (libmpdel-entity-id entity2)))
 
 
 ;;; Helper queries

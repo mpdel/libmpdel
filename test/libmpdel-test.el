@@ -125,6 +125,52 @@
 (ert-deftest libmpdel-group-data-of-nil-is-nil ()
   (should (null (libmpdel-group-data nil))))
 
+(ert-deftest libmpdel-equal ()
+  (let* ((artist1 (libmpdel--artist-create :name "artist1"))
+         (artist1-bis (libmpdel--artist-create :name "artist1"))
+         (artist2 (libmpdel--artist-create :name "artist2"))
+         (album1 (libmpdel--album-create :name "album1" :artist artist1))
+         (album1-bis (libmpdel--album-create :name "album1" :artist artist1))
+         (album2 (libmpdel--album-create :name "album2" :artist artist1))
+         (song1 (libmpdel--song-create
+                 :name "name"
+                 :file "file"
+                 :track "3"
+                 :album album1
+                 :id "1"
+                 :pos "1"))
+         (song1-bis (libmpdel--song-create
+                     :name "name"
+                     :file "file"
+                     :track "3"
+                     :album album1-bis
+                     :id "2" ;; change id and pos
+                     :pos "2"))
+         (song2 (libmpdel--song-create
+                 :name "name2"
+                 :file "file2"
+                 :track "3"
+                 :album album2
+                 :id "3"
+                 :pos "3")))
+    (should (libmpdel-equal artist1 artist1))
+    (should (libmpdel-equal artist1 artist1-bis))
+    (should (libmpdel-equal artist1-bis artist1))
+    (should (not (libmpdel-equal artist1 artist2)))
+    (should (not (libmpdel-equal artist2 artist1)))
+
+    (should (libmpdel-equal album1 album1))
+    (should (libmpdel-equal album1 album1-bis))
+    (should (libmpdel-equal album1-bis album1))
+    (should (not (libmpdel-equal album1 album2)))
+    (should (not (libmpdel-equal album2 album1)))
+
+    (should (libmpdel-equal song1 song1))
+    (should (libmpdel-equal song1 song1-bis))
+    (should (libmpdel-equal song1-bis song1))
+    (should (not (libmpdel-equal song1 song2)))
+    (should (not (libmpdel-equal song2 song1)))))
+
 
 ;;; Data structures
 
