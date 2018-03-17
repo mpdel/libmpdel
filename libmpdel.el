@@ -224,6 +224,22 @@ message from the server.")
 (cl-defmethod libmpdel-entity-name ((stored-playlist libmpdel-stored-playlist))
   (libmpdel--stored-playlist-name stored-playlist))
 
+(cl-defgeneric libmpdel-entity-parent (_entity)
+  "Return parent of _ENTITY."
+  nil)
+
+(cl-defmethod libmpdel-entity-parent ((song libmpdel-song))
+  (libmpdel-album song))
+
+(cl-defmethod libmpdel-entity-parent ((album libmpdel-album))
+  (libmpdel-artist album))
+
+(cl-defmethod libmpdel-entity-parent ((_artist libmpdel-artist))
+  'artists)
+
+(cl-defmethod libmpdel-entity-parent ((_stored-playlist libmpdel-stored-playlist))
+  'stored-playlists)
+
 (defun libmpdel-song-file (song)
   "Return the filename of SONG."
   (libmpdel--song-file song))
