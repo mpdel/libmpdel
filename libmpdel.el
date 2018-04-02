@@ -159,17 +159,9 @@ message from the server.")
   (type nil :read-only t)
   (what nil :read-only t))
 
-(cl-defgeneric libmpdel-artist-name (object)
-  "Return artist name of OBJECT.")
-
-(cl-defmethod libmpdel-artist-name ((artist libmpdel-artist))
-  (libmpdel--artist-name artist))
-
-(cl-defmethod libmpdel-artist-name ((album libmpdel-album))
-  (libmpdel-artist-name (libmpdel--album-artist album)))
-
-(cl-defmethod libmpdel-artist-name ((song libmpdel-song))
-  (libmpdel-artist-name (libmpdel--song-album song)))
+(defun libmpdel-artist-name (entity)
+  "Return artist name of ENTITY."
+  (libmpdel--artist-name (libmpdel-artist entity)))
 
 (cl-defgeneric libmpdel-artist (object)
   "Return artist of OBJECT.")
