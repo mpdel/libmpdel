@@ -38,9 +38,29 @@ have any yet. Don't worry, that's simple and you won't regret it.
 
 ** Usage
 
-The source code is well documented and organized in sections. Please
-have a look at it. I should write a proper package documentation but
-haven't done that yet.
+This code is a library and is meant for Emacs Lisp developers. The
+source code is well documented and organized in sections. Please have
+a look at it.
+
+*** Entities
+
+The library is implemented around a set of entities.
+
+| *Name*           | *Type*    | *Fields*             | *Description*                                    |
+|------------------+-----------+----------------------+--------------------------------------------------|
+| song             | structure | name, album, file, … |                                                  |
+| album            | structure | name, artist         |                                                  |
+| artist           | structure | name                 |                                                  |
+| stored-playlist  | structure | name                 | A named user-specified sequence of songs         |
+| search-criteria  | structure | type, what           | Read the [[https://www.musicpd.org/doc/protocol/database.html][protocol documentation]]                  |
+|------------------+-----------+----------------------+--------------------------------------------------|
+| current-playlist | symbol    | /none/               | Represent the currently played sequence of songs |
+| artists          | symbol    | /none/               | Represent the set of all artists                 |
+| stored-playlists | symbol    | /none/               | Represent the set of all stored playlists        |
+
+Many functions in MPDel work on several kinds of entities (e.g.,
+~libmpdel-list~). These methods are implemented with ~cl-defgeneric~
+and ~cl-defmethod~.
 
 ** License
 
