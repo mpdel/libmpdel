@@ -82,6 +82,19 @@
     (should (equal "The song" (libmpdel-entity-name song)))
     (should (equal "The playlist" (libmpdel-entity-name stored-playlist)))))
 
+(ert-deftest libmpdel-entity-parent ()
+  (let* ((artist (libmpdel--artist-create :name "The Artist"))
+         (album (libmpdel--album-create :name "The Album" :artist artist))
+         (song (libmpdel--song-create :name "The song" :album album))
+         (stored-playlist (libmpdel--stored-playlist-create :name "The playlist")))
+    (should (equal 'artists (libmpdel-entity-parent artist)))
+    (should (equal artist (libmpdel-entity-parent album)))
+    (should (equal album (libmpdel-entity-parent song)))
+    (should (equal 'stored-playlists (libmpdel-entity-parent stored-playlist)))
+    (should-not (libmpdel-entity-parent 'stored-playlists))
+    (should-not (libmpdel-entity-parent 'artists))
+    (should-not (libmpdel-entity-parent 'current-playlist))))
+
 
 ;;; Helper functions
 

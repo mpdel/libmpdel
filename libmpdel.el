@@ -204,7 +204,7 @@ message from the server.")
   (libmpdel--stored-playlist-name stored-playlist))
 
 (cl-defgeneric libmpdel-entity-parent (_entity)
-  "Return parent of _ENTITY."
+  "Return parent of ENTITY."
   nil)
 
 (cl-defmethod libmpdel-entity-parent ((song libmpdel-song))
