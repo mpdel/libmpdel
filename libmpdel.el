@@ -163,8 +163,8 @@ message from the server.")
   "Return artist name of ENTITY."
   (libmpdel--artist-name (libmpdel-artist entity)))
 
-(cl-defgeneric libmpdel-artist (object)
-  "Return artist of OBJECT.")
+(cl-defgeneric libmpdel-artist (entity)
+  "Return artist of ENTITY.")
 
 (cl-defmethod libmpdel-artist ((artist libmpdel-artist))
   artist)
@@ -175,8 +175,8 @@ message from the server.")
 (cl-defmethod libmpdel-artist ((song libmpdel-song))
   (libmpdel-artist (libmpdel--song-album song)))
 
-(cl-defgeneric libmpdel-album-name (object)
-  "Return album name of OBJECT.")
+(cl-defgeneric libmpdel-album-name (entity)
+  "Return album name of ENTITY.")
 
 (cl-defmethod libmpdel-album-name ((album libmpdel-album))
   (libmpdel--album-name album))
@@ -184,8 +184,8 @@ message from the server.")
 (cl-defmethod libmpdel-album-name ((song libmpdel-song))
   (libmpdel-album-name (libmpdel--song-album song)))
 
-(cl-defgeneric libmpdel-album (object)
-  "Return album of OBJECT.")
+(cl-defgeneric libmpdel-album (entity)
+  "Return album of ENTITY.")
 
 (cl-defmethod libmpdel-album ((album libmpdel-album))
   album)
@@ -193,8 +193,8 @@ message from the server.")
 (cl-defmethod libmpdel-album ((song libmpdel-song))
   (libmpdel--song-album song))
 
-(cl-defgeneric libmpdel-entity-name (object)
-  "Return basename of OBJECT.")
+(cl-defgeneric libmpdel-entity-name (entity)
+  "Return basename of ENTITY.")
 
 (cl-defmethod libmpdel-entity-name ((artist libmpdel-artist))
   (libmpdel--artist-name artist))
@@ -468,7 +468,7 @@ bound containing the value to set."
   (eq 'stop (libmpdel-play-state)))
 
 (libmpdel--define-state current-song
-  "An object representing currently played song."
+  "An entity representing currently played song."
   (let ((old-song libmpdel--current-song))
     (when (or (not old-song) (not (equal new-value (libmpdel-song-id old-song))))
       (libmpdel-send-command
@@ -635,8 +635,8 @@ If HANDLER is nil, ignore response."
 
 ;;; Helper queries
 
-(cl-defgeneric libmpdel-entity-to-criteria (object)
-  "Return search criteria matching OBJECT.")
+(cl-defgeneric libmpdel-entity-to-criteria (entity)
+  "Return search criteria matching ENTITY.")
 
 (cl-defmethod libmpdel-entity-to-criteria ((query string))
   query)
@@ -654,10 +654,10 @@ If HANDLER is nil, ignore response."
           (libmpdel-entity-to-criteria (libmpdel-album song))
           (libmpdel-entity-name song)))
 
-(cl-defgeneric libmpdel-list (object function)
-  "Call FUNCTION with all entries matching OBJECT.")
+(cl-defgeneric libmpdel-list (entity function)
+  "Call FUNCTION with all entries matching ENTITY.")
 
-(cl-defmethod libmpdel-list ((_object (eql artists)) function)
+(cl-defmethod libmpdel-list ((_entity (eql artists)) function)
   (libmpdel-send-command
    "list artist"
    (lambda (data)
@@ -666,7 +666,7 @@ If HANDLER is nil, ignore response."
                (lambda (artist-name) (libmpdel--artist-create :name artist-name))
                (libmpdel-sorted-entries data 'Artist))))))
 
-(cl-defmethod libmpdel-list ((_object (eql stored-playlists)) function)
+(cl-defmethod libmpdel-list ((_entity (eql stored-playlists)) function)
   "Call FUNCTION with all stored playlists as parameters."
   (libmpdel-send-command
    "listplaylists"
