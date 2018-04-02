@@ -38,6 +38,48 @@
   (should (string-match-p libmpdel--response-regexp "Artist: A-ha\nOK\n")))
 
 
+;;; Data structures
+
+(ert-deftest libmpdel-artist ()
+  (let* ((artist (libmpdel--artist-create :name "The Artist"))
+         (album (libmpdel--album-create :name "The Album" :artist artist))
+         (song (libmpdel--song-create :name "The song" :album album)))
+    (should (equal artist (libmpdel-artist artist)))
+    (should (equal artist (libmpdel-artist album)))
+    (should (equal artist (libmpdel-artist song)))))
+
+(ert-deftest libmpdel-artist-name ()
+  (let* ((artist (libmpdel--artist-create :name "The Artist"))
+         (album (libmpdel--album-create :name "The Album" :artist artist))
+         (song (libmpdel--song-create :name "The song" :album album)))
+    (should (equal "The Artist" (libmpdel-artist-name artist)))
+    (should (equal "The Artist" (libmpdel-artist-name album)))
+    (should (equal "The Artist" (libmpdel-artist-name song)))))
+
+(ert-deftest libmpdel-album-name ()
+  (let* ((artist (libmpdel--artist-create :name "The Artist"))
+         (album (libmpdel--album-create :name "The Album" :artist artist))
+         (song (libmpdel--song-create :name "The song" :album album)))
+    (should-error (libmpdel-album-name artist))
+    (should (equal "The Album" (libmpdel-album-name album)))
+    (should (equal "The Album" (libmpdel-album-name song)))))
+
+(ert-deftest libmpdel-album ()
+  (let* ((artist (libmpdel--artist-create :name "The Artist"))
+         (album (libmpdel--album-create :name "The Album" :artist artist))
+         (song (libmpdel--song-create :name "The song" :album album)))
+    (should-error (libmpdel-album artist))
+    (should (equal album (libmpdel-album album)))
+    (should (equal album (libmpdel-album song)))))
+
+(ert-deftest libmpdel-entity-name ()
+  (let* ((artist (libmpdel--artist-create :name "The Artist"))
+         (album (libmpdel--album-create :name "The Album" :artist artist))
+         (song (libmpdel--song-create :name "The song" :album album)))
+    (should (equal "The Artist"(libmpdel-entity-name artist)))
+    (should (equal "The Album" (libmpdel-entity-name album)))
+    (should (equal "The song" (libmpdel-entity-name song)))))
+
 ;;; Helper functions
 
 (ert-deftest libmpdel-extract-data ()
@@ -171,48 +213,6 @@
     (should (not (libmpdel-equal song1 song2)))
     (should (not (libmpdel-equal song2 song1)))))
 
-
-;;; Data structures
-
-(ert-deftest libmpdel-artist-name ()
-  (let* ((artist (libmpdel--artist-create :name "The Artist"))
-         (album (libmpdel--album-create :name "The Album" :artist artist))
-         (song (libmpdel--song-create :name "The song" :album album)))
-    (should (equal "The Artist" (libmpdel-artist-name artist)))
-    (should (equal "The Artist" (libmpdel-artist-name album)))
-    (should (equal "The Artist" (libmpdel-artist-name song)))))
-
-(ert-deftest libmpdel-artist ()
-  (let* ((artist (libmpdel--artist-create :name "The Artist"))
-         (album (libmpdel--album-create :name "The Album" :artist artist))
-         (song (libmpdel--song-create :name "The song" :album album)))
-    (should (equal artist (libmpdel-artist artist)))
-    (should (equal artist (libmpdel-artist album)))
-    (should (equal artist (libmpdel-artist song)))))
-
-(ert-deftest libmpdel-album-name ()
-  (let* ((artist (libmpdel--artist-create :name "The Artist"))
-         (album (libmpdel--album-create :name "The Album" :artist artist))
-         (song (libmpdel--song-create :name "The song" :album album)))
-    (should-error (libmpdel-album-name artist))
-    (should (equal "The Album" (libmpdel-album-name album)))
-    (should (equal "The Album" (libmpdel-album-name song)))))
-
-(ert-deftest libmpdel-album ()
-  (let* ((artist (libmpdel--artist-create :name "The Artist"))
-         (album (libmpdel--album-create :name "The Album" :artist artist))
-         (song (libmpdel--song-create :name "The song" :album album)))
-    (should-error (libmpdel-album artist))
-    (should (equal album (libmpdel-album album)))
-    (should (equal album (libmpdel-album song)))))
-
-(ert-deftest libmpdel-entity-name ()
-  (let* ((artist (libmpdel--artist-create :name "The Artist"))
-         (album (libmpdel--album-create :name "The Album" :artist artist))
-         (song (libmpdel--song-create :name "The song" :album album)))
-    (should (equal "The Artist"(libmpdel-entity-name artist)))
-    (should (equal "The Album" (libmpdel-entity-name album)))
-    (should (equal "The song" (libmpdel-entity-name song)))))
 
 ;;; Playlist queries
 
