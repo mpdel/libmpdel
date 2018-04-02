@@ -153,19 +153,11 @@ message from the server.")
                (:conc-name libmpdel--stored-playlist-))
   (name nil :read-only t))
 
-(cl-defstruct (libmpdel-current-playlist
-               (:constructor libmpdel--current-playlist-create)
-               (:conc-name libmpdel--current-playlist-)))
-
 (cl-defstruct (libmpdel-search-criteria
                (:constructor libmpdel-search-criteria-create)
                (:conc-name libmpdel--search-criteria-))
   (type nil :read-only t)
   (what nil :read-only t))
-
-(defun libmpdel-current-playlist ()
-  "Return the current playlist."
-  (libmpdel--current-playlist-create))
 
 (cl-defgeneric libmpdel-artist-name (object)
   "Return artist name of OBJECT.")
@@ -282,6 +274,10 @@ message from the server.")
 (defun libmpdel--create-songs-from-data (data)
   "Return a list of songs from DATA, a server's response."
   (mapcar #'libmpdel--create-song-from-data (libmpdel-group-data data)))
+
+(defun libmpdel-current-playlist-p (entity)
+  "Return non-nil if ENTITY is the current playlist."
+  (eq entity 'current-playlist))
 
 
 ;;; Helper functions
@@ -543,13 +539,13 @@ The user is asked to choose for a stored playlist first."
   "Add ENTITY to a current playlist.
 
 ENTITY can also be a list of entities to add."
-  (libmpdel-playlist-add entity (libmpdel-current-playlist)))
+  (libmpdel-playlist-add entity 'current-playlist))
 
 (defun libmpdel-current-playlist-replace (entity)
   "Replace current playlist with ENTITY.
 
 ENTITY can also be a list of entities to replace with."
-  (libmpdel-playlist-replace entity (libmpdel-current-playlist)))
+  (libmpdel-playlist-replace entity 'current-playlist))
 
 (defun libmpdel-stored-playlist-add (entity)
   "Add ENTITY to a stored playlist.
@@ -717,7 +713,7 @@ If HANDLER is nil, ignore response."
    (lambda (data)
      (funcall function (libmpdel--create-songs-from-data data)))))
 
-(cl-defmethod libmpdel-list ((_ libmpdel-current-playlist) function)
+(cl-defmethod libmpdel-list ((_ (eql current-playlist)) function)
   (libmpdel-send-command
    "playlistinfo"
    (lambda (data)
@@ -730,7 +726,7 @@ If HANDLER is nil, ignore response."
   "Add ENTITY to PLAYLIST.
 ENTITY can also be a list of entities to add.")
 
-(cl-defmethod libmpdel-playlist-add (entity (_ libmpdel-current-playlist))
+(cl-defmethod libmpdel-playlist-add (entity (_ (eql current-playlist)))
   (libmpdel-send-command `("findadd %s" ,(libmpdel-entity-to-criteria entity))))
 
 (cl-defmethod libmpdel-playlist-add (entity (stored-playlist libmpdel-stored-playlist))
@@ -739,7 +735,7 @@ ENTITY can also be a list of entities to add.")
      ,(libmpdel-entity-name stored-playlist)
      ,(libmpdel-entity-to-criteria entity))))
 
-(cl-defmethod libmpdel-playlist-add ((stored-playlist libmpdel-stored-playlist) (_ libmpdel-current-playlist))
+(cl-defmethod libmpdel-playlist-add ((stored-playlist libmpdel-stored-playlist) (_ (eql current-playlist)))
   "Add content of STORED-PLAYLIST to the current playlist."
   (libmpdel-send-command `("load %S" ,(libmpdel-entity-name stored-playlist))))
 
@@ -755,7 +751,7 @@ ENTITY can also be a list of entities to add.")
 (cl-defgeneric libmpdel-playlist-clear (playlist)
   "Remove all songs from PLAYLIST.")
 
-(cl-defmethod libmpdel-playlist-clear ((_ libmpdel-current-playlist))
+(cl-defmethod libmpdel-playlist-clear ((_ (eql current-playlist)))
   (libmpdel-send-command "clear"))
 
 (cl-defmethod libmpdel-playlist-clear ((playlist libmpdel-stored-playlist))
@@ -764,7 +760,7 @@ ENTITY can also be a list of entities to add.")
 (cl-defgeneric libmpdel-playlist-delete (songs playlist)
   "Remove SONGS from PLAYLIST.")
 
-(cl-defmethod libmpdel-playlist-delete (songs (_ libmpdel-current-playlist))
+(cl-defmethod libmpdel-playlist-delete (songs (_ (eql current-playlist)))
   (libmpdel-send-commands
    (mapcar (lambda (song) (format "deleteid %s" (libmpdel-song-id song)))
            songs)))
