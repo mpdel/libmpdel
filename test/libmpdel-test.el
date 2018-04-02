@@ -75,10 +75,13 @@
 (ert-deftest libmpdel-entity-name ()
   (let* ((artist (libmpdel--artist-create :name "The Artist"))
          (album (libmpdel--album-create :name "The Album" :artist artist))
-         (song (libmpdel--song-create :name "The song" :album album)))
-    (should (equal "The Artist"(libmpdel-entity-name artist)))
+         (song (libmpdel--song-create :name "The song" :album album))
+         (stored-playlist (libmpdel--stored-playlist-create :name "The playlist")))
+    (should (equal "The Artist" (libmpdel-entity-name artist)))
     (should (equal "The Album" (libmpdel-entity-name album)))
-    (should (equal "The song" (libmpdel-entity-name song)))))
+    (should (equal "The song" (libmpdel-entity-name song)))
+    (should (equal "The playlist" (libmpdel-entity-name stored-playlist)))))
+
 
 ;;; Helper functions
 
