@@ -175,14 +175,9 @@ message from the server.")
 (cl-defmethod libmpdel-artist ((song libmpdel-song))
   (libmpdel-artist (libmpdel--song-album song)))
 
-(cl-defgeneric libmpdel-album-name (entity)
-  "Return album name of ENTITY.")
-
-(cl-defmethod libmpdel-album-name ((album libmpdel-album))
-  (libmpdel--album-name album))
-
-(cl-defmethod libmpdel-album-name ((song libmpdel-song))
-  (libmpdel-album-name (libmpdel--song-album song)))
+(defun libmpdel-album-name (entity)
+  "Return album name of ENTITY."
+  (libmpdel--album-name (libmpdel-album entity)))
 
 (cl-defgeneric libmpdel-album (entity)
   "Return album of ENTITY.")
