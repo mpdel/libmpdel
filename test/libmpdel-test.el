@@ -24,6 +24,8 @@
 ;;; Code:
 
 (require 'ert)
+(require 'ert-x)
+
 (require 'cl-lib)
 
 (require 'libmpdel)
@@ -102,8 +104,93 @@
     (should-not (libmpdel-entity-parent 'artists))
     (should-not (libmpdel-entity-parent 'current-playlist))))
 
+(ert-deftest libmpdel-create-song-from-data ()
+  (let ((song (libmpdel--create-song-from-data
+               '((Title . "The song")
+                 (file . "foo/song.ogg")
+                 (Album . "The Album")
+                 (Artist . "The Artist")))))
+    (should (equal "The song" (libmpdel-entity-name song)))
+    (should (equal "foo/song.ogg" (libmpdel-song-file song)))
+    (should (equal "The Album" (libmpdel-entity-name (libmpdel-album song))))
+    (should (equal "The Artist" (libmpdel-entity-name (libmpdel-artist (libmpdel-album song)))))))
+
+(ert-deftest libmpdel-current-playlist-p ()
+  (should (libmpdel-current-playlist-p 'current-playlist))
+  (should-not (libmpdel-current-playlist-p (libmpdel--stored-playlist-create :name "The Playlist")))
+  (should-not (libmpdel-current-playlist-p (libmpdel--artist-create :name "The Artist"))))
+
 
 ;;; Helper functions
+
+(defmacro libmpdel--with-connection (&rest body)
+  "Execute BODY within a new fake MPD connection."
+  `(let ((libmpdel--msghandlers (list))
+         (libmpdel--connection (list))
+         (commands (list))
+         (log (list)))
+     (cl-letf (((symbol-function 'libmpdel--log)
+                (lambda (string type-string) (setq log (append log (list (cons string type-string))))))
+               ((symbol-function 'libmpdel--raw-send-command)
+                (lambda (command) (setq commands (append commands (list command))))))
+       ,@body)))
+
+(ert-deftest libmpdel--raw-send-command-with-handler-with-a-string ()
+  (libmpdel--with-connection
+   (libmpdel--raw-send-command-with-handler "command")
+   (should (equal "command" (car commands)))))
+
+(ert-deftest libmpdel--raw-send-command-with-handler-with-a-list ()
+  (libmpdel--with-connection
+   (libmpdel--raw-send-command-with-handler '("%s foo %S" "a" "b"))
+   (should (equal "a foo \"b\"" (car commands)))))
+
+(ert-deftest libmpdel--raw-send-command-with-handler-update-handlers ()
+  (libmpdel--with-connection
+   (ert-with-test-buffer ()
+     (libmpdel--raw-send-command-with-handler "command" 'foo)
+     (let ((handler (car libmpdel--msghandlers)))
+       (should (equal (cl-first handler) "command"))
+       (should (eql 'foo (cl-second handler)))
+       (should (eql (current-buffer) (cl-third handler)))))))
+
+(ert-deftest libmpdel--raw-send-command-with-handler-add-ignore-handler ()
+  (libmpdel--with-connection
+   (libmpdel--raw-send-command-with-handler "command")
+   (let ((handler (car libmpdel--msghandlers)))
+     (should (eql #'libmpdel--msghandler-ignore (cl-second handler))))))
+
+(ert-deftest libmpdel--message-filter-activates-saved-buffer ()
+  (let* ((expected-buffer nil)
+         (actual-buffer nil)
+         (handler (lambda (_) (setq actual-buffer (current-buffer)))))
+    (libmpdel--with-connection
+     (ert-with-test-buffer ()
+       (setq expected-buffer (current-buffer))
+       (libmpdel--raw-send-command-with-handler "foo" handler)
+       (ert-with-test-buffer ()
+         (libmpdel--message-filter nil "OK\n")
+         (should (bufferp actual-buffer))
+         (should (equal expected-buffer actual-buffer)))))))
+
+(ert-deftest libmpdel--message-filter-keeps-current-buffer-if-saved-one-died ()
+  (let* ((dead-buffer nil)
+         (actual-buffer nil)
+         (handler (lambda (_) (setq actual-buffer (current-buffer)))))
+    (libmpdel--with-connection
+     (ert-with-test-buffer ()
+       (setq dead-buffer (current-buffer))
+       (libmpdel--raw-send-command-with-handler "foo" handler))
+     (ert-with-test-buffer ()
+       (libmpdel--message-filter nil "OK\n")
+       (should (bufferp actual-buffer))
+       (should-not (equal dead-buffer actual-buffer))
+       (should (equal (current-buffer) actual-buffer))))))
+
+(ert-deftest libmpdel--msghandler-status-updates-volume ()
+  (libmpdel--with-connection
+   (libmpdel--msghandler-status '((volume . "42")))
+   (should (equal (libmpdel-volume) "42"))))
 
 (ert-deftest libmpdel-extract-data ()
   (should (equal '()
