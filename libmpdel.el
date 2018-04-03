@@ -388,6 +388,14 @@ command."
   (libmpdel--raw-send-command-with-handler "idle" #'libmpdel--msghandler-idle)
   (mapc (lambda (changed-subsystem)
           (cl-case (intern (cdr changed-subsystem))
+            ;; At this point, libmpdel has only been informed that
+            ;; something changed (e.g., "the current playlist has been
+            ;; changed"). We don't have the details (e.g., "the
+            ;; current playlist contains these songs").  As a result,
+            ;; hook functions will have to fetch the details by
+            ;; themselves if they need to.  On the contrary, for hook
+            ;; functions requiring libmpdel to have new data, use
+            ;; `libmpdel--msghandler-status'.
             (playlist (run-hooks 'libmpdel-current-playlist-changed-hook))
             (stored_playlist (run-hooks 'libmpdel-stored-playlist-changed-hook))))
         data))
