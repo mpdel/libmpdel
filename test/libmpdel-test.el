@@ -37,6 +37,13 @@
   (should (string-match-p libmpdel--response-regexp "ACK [51@10] {} unknown command \"foobar\"\n"))
   (should (string-match-p libmpdel--response-regexp "Artist: A-ha\nOK\n")))
 
+(ert-deftest libmpdel--msgfield-regexp ()
+  (save-match-data
+    (let ((line "key: value\n"))
+      (should (string-match libmpdel--msgfield-regexp line))
+      (should (equal "key" (match-string 1 line)))
+      (should (equal "value" (match-string 2 line))))))
+
 
 ;;; Data structures
 

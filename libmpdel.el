@@ -93,6 +93,15 @@ The logs of this connection are accessible in the *mpd* buffer.")
       "\n")
   "Regexp matching the responses sent by the MPD server.")
 
+(defconst libmpdel--msgfield-regexp
+  (rx line-start
+      (group (+? (not (any ?:))))
+      ": "
+      (group (* not-newline))
+      line-end)
+  "Regexp matching a line consisting of a key and a value.
+The key is stored in group 1 and the value in group 2.")
+
 (defvar libmpdel--msghandlers nil
   "Current commands sent to the server.
 Each element in the list is of the form (COMMAND HANDLER BUFFER).
@@ -399,14 +408,6 @@ command."
   "No handler was associated to last response."
   ;; nothing to do
   nil)
-
-(defconst libmpdel--msgfield-regexp
-  (rx line-start
-      (group (+? (not (any ?:))))
-      ": "
-      (group (* not-newline))
-      line-end)
-  "Regexp matching a line consisting of a key and a value.")
 
 (defun libmpdel--extract-data (message)
   "Return MESSAGE."
