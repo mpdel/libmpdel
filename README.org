@@ -7,15 +7,11 @@
         </a>
 
         <a href="https://melpa.org/#/libmpdel">
-          <img alt="MELPA Stable" src="https://melpa.org/packages/libmpdel-badge.svg"/>
+          <img alt="MELPA" src="https://melpa.org/packages/libmpdel-badge.svg"/>
         </a>
 
         <a href="https://gitlab.petton.fr/mpdel/libmpdel/commits/master">
           <img alt="pipeline status" src="https://gitlab.petton.fr/mpdel/libmpdel/badges/master/pipeline.svg" />
-        </a>
-
-        <a href="https://liberapay.com/DamienCassou/donate">
-          <img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg">
         </a>
       </p>
   #+END_HTML
