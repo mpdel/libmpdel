@@ -660,7 +660,8 @@ If HANDLER is nil, ignore response."
           (libmpdel-entity-name song)))
 
 (cl-defgeneric libmpdel-list (entity function)
-  "Call FUNCTION with all entries matching ENTITY.")
+  "Call FUNCTION with all entries matching ENTITY."
+  (libmpdel-list-songs entity function))
 
 (cl-defmethod libmpdel-list ((_entity (eql artists)) function)
   (libmpdel-send-command
@@ -681,14 +682,6 @@ If HANDLER is nil, ignore response."
                (lambda (playlist-name) (libmpdel--stored-playlist-create :name playlist-name))
                (libmpdel-sorted-entries data 'playlist))))))
 
-(cl-defmethod libmpdel-list ((search-criteria libmpdel-search-criteria) function)
-  (libmpdel-send-command
-   `("search %s %S"
-     ,(libmpdel--search-criteria-type search-criteria)
-     ,(libmpdel--search-criteria-what search-criteria))
-   (lambda (data)
-     (funcall function (libmpdel--create-songs-from-data data)))))
-
 (cl-defmethod libmpdel-list ((artist libmpdel-artist) function)
   (libmpdel-send-command
    `("list album %s" ,(libmpdel-entity-to-criteria artist))
@@ -698,23 +691,46 @@ If HANDLER is nil, ignore response."
                (lambda (album-name) (libmpdel--album-create :name album-name :artist artist))
                (libmpdel-sorted-entries data 'Album))))))
 
-(cl-defmethod libmpdel-list ((album libmpdel-album) function)
+(cl-defgeneric libmpdel-list-songs (entity function)
+  "Call FUNCTION with all songs matching ENTITY."
   (libmpdel-send-command
-   `("find %s" ,(libmpdel-entity-to-criteria album))
+   `("find %s" ,(libmpdel-entity-to-criteria entity))
    (lambda (data)
      (funcall function (libmpdel--create-songs-from-data data)))))
 
-(cl-defmethod libmpdel-list ((stored-playlist libmpdel-stored-playlist) function)
+(cl-defmethod libmpdel-list-songs ((stored-playlist libmpdel-stored-playlist) function)
   (libmpdel-send-command
    `("listplaylistinfo %S" ,(libmpdel-entity-name stored-playlist))
    (lambda (data)
      (funcall function (libmpdel--create-songs-from-data data)))))
 
-(cl-defmethod libmpdel-list ((_ (eql current-playlist)) function)
+(cl-defmethod libmpdel-list-songs ((_ (eql current-playlist)) function)
   (libmpdel-send-command
    "playlistinfo"
    (lambda (data)
      (funcall function (libmpdel--create-songs-from-data data)))))
+
+(cl-defmethod libmpdel-list-songs ((search-criteria libmpdel-search-criteria) function)
+  (libmpdel-send-command
+   `("search %s %S"
+     ,(libmpdel--search-criteria-type search-criteria)
+     ,(libmpdel--search-criteria-what search-criteria))
+   (lambda (data)
+     (funcall function (libmpdel--create-songs-from-data data)))))
+
+(cl-defmethod libmpdel-list-songs ((song libmpdel-song) function)
+  (funcall function (list song)))
+
+(cl-defmethod libmpdel-list-songs ((entities list) function)
+  "Apply FUNCTION only once for every song in ENTITIES."
+  (if (not entities)
+      (funcall function nil)
+    (libmpdel-list-songs
+     (cdr entities)
+     (lambda (latter-songs)
+       (libmpdel-list-songs
+        (car entities)
+        (lambda (first-songs) (funcall function (append first-songs latter-songs))))))))
 
 
 ;;; Playlist queries
