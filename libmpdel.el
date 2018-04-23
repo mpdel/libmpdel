@@ -799,6 +799,13 @@ ENTITY can also be a list of entities to add.")
                  (format "moveid %s %s" (libmpdel-song-id song) (1+ (libmpdel-song-position song))))
                songs)))))
 
+(defun libmpdel-playlist-save (name)
+  "Save current playlist as new stored playlist named NAME."
+  (interactive (list (read-from-minibuffer "Enter a new playlist name: ")))
+  (libmpdel-send-command
+   `("save %S" ,name)
+   (lambda (_data) (message "Current playlist saved to %S" name))))
+
 
 ;;; Playback queries
 
