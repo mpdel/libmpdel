@@ -589,14 +589,15 @@ If HANDLER is nil, ignore response."
     (libmpdel--raw-send-command "noidle"))
   (libmpdel--raw-send-command-with-handler command handler))
 
-(defun libmpdel-send-commands (commands)
-  "Send several COMMANDS at once."
+(defun libmpdel-send-commands (commands &optional handler)
+  "Send several COMMANDS at once and execute HANDLER once with result."
   (libmpdel-send-command
    (with-temp-buffer
      (insert "command_list_begin\n")
      (mapc (lambda (command) (insert command "\n")) commands)
      (insert "command_list_end")
-     (buffer-substring-no-properties (point-min) (point-max)))))
+     (buffer-substring-no-properties (point-min) (point-max)))
+   handler))
 
 (defun libmpdel-entries (data key)
   "Collect DATA entries matching KEY."
