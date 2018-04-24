@@ -21,7 +21,7 @@ ci-dependencies:
 	--funcall package-refresh-contents \
 	--eval "(package-install 'package-lint)"
 
-check: test lint
+check: lint test
 
 test:
 	$(BATCH) --eval "(progn\
