@@ -402,15 +402,18 @@ command."
 
 (defun libmpdel--msghandler-status (data)
   "Handler for the response DATA to the \"status\" command."
-  (mapc (lambda (status-pair)
-          (let ((status-key (car status-pair))
-                (status-value (cdr status-pair)))
-            (cl-case status-key
-              (state (libmpdel--set-play-state status-value))
-              (songid (libmpdel--set-current-song status-value))
-              (playlistlength (libmpdel--set-playlist-length status-value))
-              (volume (libmpdel--set-volume status-value)))))
-        data))
+  (dolist (status-pair data)
+    (let ((status-key (car status-pair))
+          (status-value (cdr status-pair)))
+      (cl-case status-key
+        (state (libmpdel--set-play-state status-value))
+        (songid (libmpdel--set-current-song status-value))
+        (playlistlength (libmpdel--set-playlist-length status-value))
+        (volume (libmpdel--set-volume status-value)))))
+  ;; When no song is being played, 'songid is not in DATA.  If that's
+  ;; the case, we have to set current song to nil:
+  (unless (cl-member 'songid data :key #'car)
+    (libmpdel--set-current-song nil)))
 
 (defun libmpdel--msghandler-ignore (_)
   "No handler was associated to last response."
@@ -473,13 +476,17 @@ bound containing the value to set."
 
 (libmpdel--define-state current-song
   "An entity representing currently played song."
-  (let ((old-song libmpdel--current-song))
-    (when (or (not old-song) (not (equal new-value (libmpdel-song-id old-song))))
-      (libmpdel-send-command
-       "currentsong"
-       (lambda (data)
-         (setq libmpdel--current-song (libmpdel--create-song-from-data data))
-         (run-hooks 'libmpdel-current-song-changed-hook))))))
+  (when (libmpdel--new-current-song-p new-value)
+    (libmpdel-send-command
+     "currentsong"
+     (lambda (data)
+       (setq libmpdel--current-song (and data (libmpdel--create-song-from-data data)))
+       (run-hooks 'libmpdel-current-song-changed-hook)))))
+
+(defun libmpdel--new-current-song-p (song-id)
+  "Return non-nil if SONG-ID differs from `libmpdel--current-song'."
+  (let ((current-song-id (and libmpdel--current-song (libmpdel-song-id libmpdel--current-song))))
+    (not (equal song-id current-song-id))))
 
 (libmpdel--define-state playlist-length
   "Number of songs in current playlist."
