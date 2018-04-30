@@ -38,3 +38,6 @@ lint :
 	$(BATCH) \
 	--eval "(require 'package-lint)" \
 	-f package-lint-batch-and-exit ${SRCS}
+
+	# Run checkdoc to check Emacs Lisp conventions
+	$(BATCH) --eval "(mapcar #'checkdoc-file '($(patsubst %, \"%\", ${SRCS})))"
