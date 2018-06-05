@@ -950,3 +950,7 @@ not specify it, everything is updated."
 
 (provide 'libmpdel)
 ;;; libmpdel.el ends here
+
+;; Local Variables:
+;; checkdoc-arguments-in-order-flag: nil
+;; End:
