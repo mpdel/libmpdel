@@ -1,43 +1,21 @@
-SRCS = libmpdel.el
-TESTS = test/libmpdel-test.el
+PACKAGE_BASENAME = libmpdel
 
-LOAD_PATH = -L . -L ../package-lint
+CURL = curl --fail --silent --show-error --insecure --location --retry 9 --retry-delay 9
+GITHUB = https://raw.githubusercontent.com
 
-EMACSBIN ?= emacs
-BATCH     = $(EMACSBIN) -Q --batch $(LOAD_PATH) \
-		--eval "(setq load-prefer-newer t)" \
-		--eval "(require 'package)" \
-		--eval "(add-to-list 'package-archives '(\"melpa-stable\" . \"http://stable.melpa.org/packages/\"))" \
-		--eval "(setq enable-dir-local-variables nil)" \
-		--funcall package-initialize
+export CI=false
 
-.PHONY: all ci-dependencies check test lint
+emake.mk:
+	$(CURL) -O ${GITHUB}/vermiculus/emake.el/master/emake.mk
 
-all: check
+# Include emake.mk if present
+-include emake.mk
 
-ci-dependencies:
-	# Install dependencies in ~/.emacs.d/elpa
-	$(BATCH) \
-	--funcall package-refresh-contents \
-	--eval "(package-install 'package-lint)"
+.PHONY: check lint test
 
 check: lint test
 
-test:
-	$(BATCH) --eval "(progn\
-	(load-file \"test/libmpdel-test.el\")\
-	(ert-run-tests-batch-and-exit))"
+lint: PACKAGE_LISP += $(PACKAGE_TESTS)
+lint: lint-checkdoc lint-package-lint compile
 
-lint :
-	# Byte compile all and stop on any warning or error
-	$(BATCH) \
-	--eval "(setq byte-compile-error-on-warn t)" \
-	-f batch-byte-compile ${SRCS} ${TESTS}
-
-	# Run package-lint to check for packaging mistakes
-	$(BATCH) \
-	--eval "(require 'package-lint)" \
-	-f package-lint-batch-and-exit ${SRCS}
-
-	# Run checkdoc to check Emacs Lisp conventions
-	$(BATCH) --eval "(mapcar #'checkdoc-file '($(patsubst %, \"%\", ${SRCS})))"
+test: test-ert
