@@ -154,7 +154,7 @@ message from the server.")
   (track nil :read-only t)
   (file nil :read-only t)
   (album nil :read-only t)
-  (disk nil :read-only t)
+  (disc nil :read-only t)
   (date nil :read-only t)
   (id nil :read-only t)
   (pos nil :read-only t))
@@ -251,9 +251,9 @@ message from the server.")
   "Return the date of SONG."
   (or (libmpdel--song-date song) ""))
 
-(defun libmpdel-song-disk (song)
-  "Return the disk number of SONG within its album."
-  (or (libmpdel--song-disk song) ""))
+(defun libmpdel-song-disc (song)
+  "Return the disc number of SONG within its album."
+  (or (libmpdel--song-disc song) ""))
 
 (defun libmpdel-song-id (song)
   "Return SONG id within the current playlist, nil if none."
@@ -275,7 +275,7 @@ message from the server.")
            :name (cdr (assq 'Album song-data))
            :artist (libmpdel--artist-create :name (cdr (assq 'Artist song-data))))
    :date (cdr (assq 'Date song-data))
-   :disk (cdr (assq 'Disk song-data))
+   :disc (cdr (assq 'Disc song-data))
    :id (cdr (assq 'Id song-data))
    :pos (cdr (assq 'Pos song-data))))
 
