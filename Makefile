@@ -5,8 +5,10 @@ GITHUB = https://raw.githubusercontent.com
 
 export CI=false
 
+EMAKE_SHA1=4323e76b4bf2c78c54e8d78f794ddf26898743de
+
 emake.mk:
-	$(CURL) -O ${GITHUB}/vermiculus/emake.el/master/emake.mk
+	$(CURL) -O ${GITHUB}/vermiculus/emake.el/${EMAKE_SHA1}/emake.mk
 
 # Include emake.mk if present
 -include emake.mk
