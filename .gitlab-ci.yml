@@ -3,6 +3,7 @@ image: ubuntu:latest
 .test_job_template: &test_job_definition
   script:
     - emacs --version
+    - make ci-dependencies
     - make check
 
 test:emacs:25.1:

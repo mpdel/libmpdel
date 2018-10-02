@@ -1,23 +1,21 @@
-PACKAGE_BASENAME = libmpdel
+ELPA_DEPENDENCIES=package-lint
 
-CURL = curl --fail --silent --show-error --insecure --location --retry 9 --retry-delay 9
-GITHUB = https://raw.githubusercontent.com
+ELPA_ARCHIVES=melpa
 
-export CI=false
+LINT_CHECKDOC_FILES=$(wildcard *.el) $(wildcard test/*.el)
+LINT_PACKAGE_LINT_FILES=$(wildcard *.el) $(wildcard test/*.el)
+LINT_COMPILE_FILES=$(wildcard *.el) $(wildcard test/*.el)
 
-EMAKE_SHA1=4323e76b4bf2c78c54e8d78f794ddf26898743de
-
-emake.mk:
-	$(CURL) -O ${GITHUB}/vermiculus/emake.el/${EMAKE_SHA1}/emake.mk
+makel.mk:
+	# Download makel
+	@if [ -f ../makel/makel.mk ]; then \
+		ln -s ../makel/makel.mk .; \
+	else \
+		curl \
+		--fail --silent --show-error --insecure --location \
+		--retry 9 --retry-delay 9 \
+		-O https://gitlab.petton.fr/DamienCassou/makel/raw/v0.2.0/makel.mk; \
+	fi
 
 # Include emake.mk if present
--include emake.mk
-
-.PHONY: check lint test
-
-check: lint test
-
-lint: PACKAGE_LISP += $(PACKAGE_TESTS)
-lint: lint-checkdoc lint-package-lint compile
-
-test: test-ert
+-include makel.mk
