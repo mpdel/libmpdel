@@ -2,6 +2,7 @@ ELPA_DEPENDENCIES=package-lint
 
 ELPA_ARCHIVES=melpa
 
+TEST_ERT_FILES=$(wildcard test/*.el)
 LINT_CHECKDOC_FILES=$(wildcard *.el) $(wildcard test/*.el)
 LINT_PACKAGE_LINT_FILES=$(wildcard *.el) $(wildcard test/*.el)
 LINT_COMPILE_FILES=$(wildcard *.el) $(wildcard test/*.el)
@@ -17,5 +18,5 @@ makel.mk:
 		-O https://gitlab.petton.fr/DamienCassou/makel/raw/v0.2.0/makel.mk; \
 	fi
 
-# Include emake.mk if present
+# Include makel.mk if present
 -include makel.mk
