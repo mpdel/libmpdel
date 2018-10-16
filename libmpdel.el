@@ -899,8 +899,11 @@ ENTITY can also be a list of entities to add.")
   (libmpdel-send-command "stop"))
 
 (defun libmpdel-play-song (song)
-  "Start playing SONG, a song of the current playlist."
-  (libmpdel-send-command `("playid %s" ,(libmpdel-song-id song))))
+  "Start playing SONG."
+  (let ((song-id (libmpdel-song-id song)))
+    (if song-id
+        (libmpdel-send-command `("playid %s" ,song-id))
+      (libmpdel-current-playlist-insert song))))
 
 ;;;###autoload
 (defun libmpdel-playback-play-pause ()
