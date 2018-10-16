@@ -579,8 +579,9 @@ ENTITY can also be a list of entities to replace with."
    (apply-partially #'libmpdel-playlist-replace entity)))
 
 (defun libmpdel-current-playlist-insert (entity)
-  "Insert ENTITY after currently-played song.
-ENTITY can also be a list of entities."
+  "Insert ENTITY after currently-played song and play it.
+ENTITY can also be a list of entities in which case all entities
+are added and the first one is played."
   (libmpdel-list-songs
    entity
    (lambda (songs)
