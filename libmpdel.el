@@ -745,6 +745,11 @@ If HANDLER is nil, ignore response."
                (lambda (artist-name) (libmpdel--artist-create :name artist-name))
                (libmpdel-sorted-entries data 'Artist))))))
 
+(cl-defmethod libmpdel-list ((_entity (eql albums)) function)
+  (libmpdel-list
+   'artists
+   (lambda (artists) (libmpdel-async-mapcan artists #'libmpdel-list function))))
+
 (cl-defmethod libmpdel-list ((_entity (eql stored-playlists)) function)
   "Call FUNCTION with all stored playlists as parameters."
   (libmpdel-send-command

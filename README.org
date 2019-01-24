@@ -50,8 +50,9 @@ The library is implemented around a set of entities.
 | stored-playlist  | structure | name                 | A named user-specified sequence of songs         |
 | search-criteria  | structure | type, what           | Read the [[https://www.musicpd.org/doc/protocol/database.html][protocol documentation]]                  |
 |------------------+-----------+----------------------+--------------------------------------------------|
-| current-playlist | symbol    | /none/               | Represent the currently played sequence of songs |
 | artists          | symbol    | /none/               | Represent the set of all artists                 |
+| albums           | symbol    | /none/               | Represent the set of all albums                  |
+| current-playlist | symbol    | /none/               | Represent the currently played sequence of songs |
 | stored-playlists | symbol    | /none/               | Represent the set of all stored playlists        |
 
 Many functions in MPDel work on several kinds of entities (e.g.,
