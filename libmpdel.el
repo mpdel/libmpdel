@@ -599,6 +599,39 @@ are added and the first one is played."
             (reverse song-ids))
            (lambda (_) (libmpdel-send-command `("playid %s" ,(car song-ids)))))))))))
 
+(defun libmpdel-async-mapcar (list mapfn callback)
+  "Apply MAPFN to each element of LIST and pass result to CALLBACK.
+
+MAPFN is a function taking 2 arguments: the element to map and a
+callback to call when the mapping is done."
+  (if (not list)
+      (funcall callback nil)
+    (funcall                  ; transform the first element
+     mapfn
+     (car list)
+     (lambda (first-mapped)
+       (libmpdel-async-mapcar         ; transform the rest
+        (cdr list)
+        mapfn
+        (lambda (latter-elements)
+          (funcall callback
+                   (cons first-mapped
+                         latter-elements))))))))
+
+(defun libmpdel-async-mapcan (list mapfn callback)
+  "Apply MAPFN to each element of LIST.
+Concatenate the results and pass that to CALLBACK.
+
+MAPFN is a function taking 2 arguments: the element to map and a
+callback to call when the mapping is done."
+  (libmpdel-async-mapcar
+   list
+   mapfn
+   (lambda (groups)
+     (funcall
+      callback
+      (apply #'cl-concatenate 'list groups)))))
+
 
 ;;; Public functions
 
@@ -763,14 +796,7 @@ If HANDLER is nil, ignore response."
 
 (cl-defmethod libmpdel-list-songs ((entities list) function)
   "Apply FUNCTION only once for every song in ENTITIES."
-  (if (not entities)
-      (funcall function nil)
-    (libmpdel-list-songs
-     (cdr entities)
-     (lambda (latter-songs)
-       (libmpdel-list-songs
-        (car entities)
-        (lambda (first-songs) (funcall function (append first-songs latter-songs))))))))
+  (libmpdel-async-mapcan entities #'libmpdel-list-songs function))
 
 
 ;;; Playlist queries
