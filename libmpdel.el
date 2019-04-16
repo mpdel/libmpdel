@@ -48,6 +48,15 @@
   "MPD server port to connect to.  Also see `libmpdel-hostname'."
   :type 'integer)
 
+(defcustom libmpdel-profiles (list (list "Local server" libmpdel-hostname libmpdel-port))
+  "List of (HOST . PORT) when using several MPD servers."
+  :type '(repeat (list
+                  :tag "Profile"
+                  :value ("Local server" "localhost" 6600)
+                  (string :tag "name")
+                  (string :tag "host")
+                  (integer :tag "port"))))
+
 (defcustom libmpdel-music-directory "~/Music"
   "MPD `music_directory' variable's value.
 
@@ -323,6 +332,19 @@ message from the server.")
   ;; server's notifications. See `libmpdel--msghandlers' for more
   ;; information.
   (libmpdel--raw-send-command-with-handler "idle" #'libmpdel--msghandler-idle))
+
+;;;###autoload
+(defun libmpdel-connect-profile (profile)
+  "Connect to MPD server defined in PROFILE.
+Interactively, let the user choose PROFILE from `libmpdel-profiles'.
+
+If a connection already exists, terminate it first."
+  (interactive (list (libmpdel--select-profile)))
+  (let* ((libmpdel-hostname (cl-second profile))
+         (libmpdel-port (cl-third profile)))
+    (when (libmpdel-connected-p)
+      (libmpdel-disconnect))
+    (libmpdel--connect)))
 
 (defun libmpdel--raw-send-command (command)
   "Send COMMAND, a string, to the server and log that."
@@ -631,6 +653,23 @@ callback to call when the mapping is done."
      (funcall
       callback
       (apply #'cl-concatenate 'list groups)))))
+
+(defun libmpdel--get-profile-from-name (name)
+  "Return an element of `libmpdel-profiles' matching NAME."
+  (cl-find name libmpdel-profiles :test #'string= :key #'car))
+
+(defun libmpdel--select-profile ()
+  "Ask the user to select a profile among `libmpdel-profiles' and return it."
+  (unless (consp libmpdel-profiles)
+    (user-error "Add profiles to `libmpdel-profiles'"))
+  (if (= 1 (length libmpdel-profiles))
+      (progn
+        (message "Only 1 profile defined in `libmpdel-profiles'")
+        (car libmpdel-profiles))
+    (let* ((profile-names (mapcar #'car libmpdel-profiles))
+           (profile-name (completing-read "Choose an MPD profile"
+                                          profile-names nil t)))
+      (libmpdel--get-profile-from-name profile-name))))
 
 
 ;;; Public functions
