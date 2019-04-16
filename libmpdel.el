@@ -46,7 +46,7 @@
 
 (defcustom libmpdel-port 6600
   "MPD server port to connect to.  Also see `libmpdel-hostname'."
-  :type 'string)
+  :type 'integer)
 
 (defcustom libmpdel-music-directory "~/Music"
   "MPD `music_directory' variable's value.
