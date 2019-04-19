@@ -445,7 +445,8 @@ command."
         (playlistlength (libmpdel--set-playlist-length status-value))
         (volume (libmpdel--set-volume status-value))
         (random (libmpdel--set-random status-value))
-        (repeat (libmpdel--set-repeat status-value)))))
+        (repeat (libmpdel--set-repeat status-value))
+        (single (libmpdel--set-single status-value)))))
   ;; When no song is being played, 'songid is not in DATA.  If that's
   ;; the case, we have to set current song to nil:
   (unless (cl-member 'songid data :key #'car)
@@ -539,6 +540,14 @@ bound containing the value to set."
 (libmpdel--define-state repeat
   "Boolean indicating if current playlist or song is repeated after it ends."
   (setq libmpdel--repeat (string= new-value "1")))
+
+(libmpdel--define-state single
+  "Symbol indicating if current song is repeated `forever', only `once' or `never'."
+  (setq libmpdel--single
+        (cond
+         ((string= new-value "oneshot") 'once)
+         ((string= new-value "1") 'forever)
+         (t 'never))))
 
 (defun libmpdel-time-to-string (time)
   "Return a string represeting TIME, a number in a string."
@@ -1033,6 +1042,28 @@ succeeds."
   "Set playback mode to sequential (not repeat)."
   (interactive)
   (libmpdel-send-command `("repeat 0")))
+
+;;;###autoload
+(defun libmpdel-playback-set-single-forever ()
+  "Set playback single mode to forever.
+This will repeat the current song forever."
+  (interactive)
+  (libmpdel-send-command `("single 1")))
+
+;;;###autoload
+(defun libmpdel-playback-set-single-never ()
+  "Set playback single mode to never.
+This will not repeat the current song."
+  (interactive)
+  (libmpdel-send-command `("single 0")))
+
+;;;###autoload
+(defun libmpdel-playback-set-single-once ()
+  "Set playback single mode to once.
+This will repeat the current song only once and then keep playing
+the current playlist."
+  (interactive)
+  (libmpdel-send-command `("single oneshot")))
 
 
 ;;; Status queries
