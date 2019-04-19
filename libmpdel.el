@@ -444,7 +444,8 @@ command."
         (songid (libmpdel--set-current-song status-value))
         (playlistlength (libmpdel--set-playlist-length status-value))
         (volume (libmpdel--set-volume status-value))
-        (random (libmpdel--set-random status-value)))))
+        (random (libmpdel--set-random status-value))
+        (repeat (libmpdel--set-repeat status-value)))))
   ;; When no song is being played, 'songid is not in DATA.  If that's
   ;; the case, we have to set current song to nil:
   (unless (cl-member 'songid data :key #'car)
@@ -534,6 +535,10 @@ bound containing the value to set."
 (libmpdel--define-state random
   "Boolean indicating if songs are played randomly or in order."
   (setq libmpdel--random (string= new-value "1")))
+
+(libmpdel--define-state repeat
+  "Boolean indicating if current playlist or song is repeated after it ends."
+  (setq libmpdel--repeat (string= new-value "1")))
 
 (defun libmpdel-time-to-string (time)
   "Return a string represeting TIME, a number in a string."
@@ -1016,6 +1021,18 @@ succeeds."
   "Set playback mode to sequential (not random)."
   (interactive)
   (libmpdel-send-command `("random 0")))
+
+;;;###autoload
+(defun libmpdel-playback-set-repeat ()
+  "Set playback mode to repeat."
+  (interactive)
+  (libmpdel-send-command `("repeat 1")))
+
+;;;###autoload
+(defun libmpdel-playback-unset-repeat ()
+  "Set playback mode to sequential (not repeat)."
+  (interactive)
+  (libmpdel-send-command `("repeat 0")))
 
 
 ;;; Status queries
