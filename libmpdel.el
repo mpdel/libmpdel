@@ -322,6 +322,7 @@ message from the server.")
                                          libmpdel-port
                                          :type 'plain)))
   (set-process-coding-system (libmpdel--process) 'utf-8-unix 'utf-8-unix)
+  (set-process-query-on-exit-flag (libmpdel--process) nil)
   ;; Take care of the initial welcome message from server that we
   ;; don't ask for:
   (setq libmpdel--msghandlers '(("welcome" libmpdel--msghandler-ignore nil)))
