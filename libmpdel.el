@@ -220,8 +220,19 @@ message from the server.")
 (cl-defmethod libmpdel-entity-name ((song libmpdel-song))
   (libmpdel--song-name song))
 
+(cl-defmethod libmpdel-entity-name ((_entity (eql artists)))
+  "All artists")
+
+(cl-defmethod libmpdel-entity-name ((_entity (eql current-playlist)))
+  "Current playlist")
+
 (cl-defmethod libmpdel-entity-name ((stored-playlist libmpdel-stored-playlist))
   (libmpdel--stored-playlist-name stored-playlist))
+
+(cl-defmethod libmpdel-entity-name ((search-criteria libmpdel-search-criteria))
+  (format "search %s: \"%s\""
+          (libmpdel--search-criteria-type search-criteria)
+          (libmpdel--search-criteria-what search-criteria)))
 
 (cl-defgeneric libmpdel-entity-parent (_entity)
   "Return parent of ENTITY."
