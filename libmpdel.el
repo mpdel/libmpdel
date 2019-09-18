@@ -6,7 +6,7 @@
 ;; Keywords: multimedia
 ;; Url: https://gitlab.petton.fr/mpdel/libmpdel
 ;; Package-requires: ((emacs "25.1"))
-;; Version: 1.1.0
+;; Version: 1.1.1
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -1029,7 +1029,9 @@ If HANDLER is non-nil, execute it with no parameter when seek
 succeeds."
   (interactive (list (read-string "New position (e.g., 67, -23, +12): ")
                      (lambda (_) (message "Seek done."))))
-  (libmpdel-send-command `("seekcur %S" ,time) (lambda (_) (funcall handler))))
+  (libmpdel-send-command
+   `("seekcur %S" ,time)
+   (when handler (lambda (_) (funcall handler)))))
 
 ;;;###autoload
 (defun libmpdel-playback-set-random ()

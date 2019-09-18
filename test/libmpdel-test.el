@@ -5,7 +5,7 @@
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Url: https://gitlab.petton.fr/mpdel/mpdel
 ;; Package-requires: ((emacs "25.1"))
-;; Version: 1.1.0
+;; Version: 1.1.1
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
