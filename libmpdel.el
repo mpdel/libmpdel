@@ -179,6 +179,11 @@ message from the server.")
   (type nil :read-only t)
   (what nil :read-only t))
 
+(cl-defstruct (libmpdel-filter
+               (:constructor libmpdel-filter-create)
+               (:conc-name libmpdel--filter-))
+  (text nil :read-only t))
+
 (defun libmpdel-artist-name (entity)
   "Return artist name of ENTITY."
   (libmpdel--artist-name (libmpdel-artist entity)))
@@ -233,6 +238,9 @@ message from the server.")
   (format "search %s: \"%s\""
           (libmpdel--search-criteria-type search-criteria)
           (libmpdel--search-criteria-what search-criteria)))
+
+(cl-defmethod libmpdel-entity-name ((filter libmpdel-filter))
+  (format "filter %s" (libmpdel--filter-text filter)))
 
 (cl-defgeneric libmpdel-entity-parent (_entity)
   "Return parent of ENTITY."
@@ -863,6 +871,12 @@ If HANDLER is nil, ignore response."
    `("search %s %S"
      ,(libmpdel--search-criteria-type search-criteria)
      ,(libmpdel--search-criteria-what search-criteria))
+   (lambda (data)
+     (funcall function (libmpdel--create-songs-from-data data)))))
+
+(cl-defmethod libmpdel-list-songs ((filter libmpdel-filter) function)
+  (libmpdel-send-command
+   `("search %S" ,(libmpdel--filter-text filter))
    (lambda (data)
      (funcall function (libmpdel--create-songs-from-data data)))))
 

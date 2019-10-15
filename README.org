@@ -49,6 +49,7 @@ The library is implemented around a set of entities.
 | artist           | structure | name                 |                                                  |
 | stored-playlist  | structure | name                 | A named user-specified sequence of songs         |
 | search-criteria  | structure | type, what           | Read the [[https://www.musicpd.org/doc/protocol/database.html][protocol documentation]]                  |
+| filter           | structure | text                 | Read the [[https://www.musicpd.org/doc/html/protocol.html#filters][protocol documentation]]                  |
 |------------------+-----------+----------------------+--------------------------------------------------|
 | artists          | symbol    | /none/               | Represent the set of all artists                 |
 | albums           | symbol    | /none/               | Represent the set of all albums                  |
