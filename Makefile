@@ -2,10 +2,10 @@ ELPA_DEPENDENCIES=package-lint let-alist
 
 ELPA_ARCHIVES=melpa-stable gnu
 
-TEST_ERT_FILES=$(wildcard test/*.el)
-LINT_CHECKDOC_FILES=$(wildcard *.el) $(wildcard test/*.el)
-LINT_PACKAGE_LINT_FILES=$(wildcard *.el) $(wildcard test/*.el)
-LINT_COMPILE_FILES=$(wildcard *.el) $(wildcard test/*.el)
+TEST_ERT_FILES		= $(wildcard test/*.el)
+LINT_CHECKDOC_FILES	= $(wildcard *.el) ${TEST_ERT_FILES}
+LINT_PACKAGE_LINT_FILES	= ${LINT_CHECKDOC_FILES}
+LINT_COMPILE_FILES	= ${LINT_CHECKDOC_FILES}
 
 makel.mk:
 	# Download makel
