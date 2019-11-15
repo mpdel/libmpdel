@@ -895,7 +895,11 @@ If HANDLER is nil, ignore response."
 ENTITY can also be a list of entities to add.")
 
 (cl-defmethod libmpdel-playlist-add (entity (_ (eql current-playlist)))
-  (libmpdel-send-command `("findadd %s" ,(libmpdel-entity-to-criteria entity))))
+  (let ((id (libmpdel-entity-id entity)))
+    (libmpdel-send-command
+     (if id
+         `("addid %S" ,id)
+       `("findadd %s" ,(libmpdel-entity-to-criteria entity))))))
 
 (cl-defmethod libmpdel-playlist-add (entity (stored-playlist libmpdel-stored-playlist))
   (libmpdel-send-command

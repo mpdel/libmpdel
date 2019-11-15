@@ -247,6 +247,31 @@
   (libmpdel--set-volume "50")
   (should (string= (libmpdel-volume) "50")))
 
+(ert-deftest libmpdel-test-playlist-add-sends-addid ()
+ (let ((gmusic-album
+        (libmpdel--create-song-from-data
+         '((Title . "Album: The Belly Of An Architect (Edicion 2007)")
+           (file . "gmusic:album:Bbtjr2k5632pgyabagduxcg3p4q")
+           (Album . "The Belly Of An Architect (Edicion 2007)")
+           (AlbumArtist . "Wim Mertens")
+           (Artist . "Wim Mertens")
+           (Date . "1983")
+           (X-AlbumUri "gmusic:album:Bbtjr2k5632pgyabagduxcg3p4q")))))
+   (libmpdel-test--with-connection
+    (libmpdel-playlist-add gmusic-album 'current-playlist)
+    (should (equal '("addid \"gmusic:album:Bbtjr2k5632pgyabagduxcg3p4q\"")
+                   (last commands))))))
+
+(ert-deftest libmpdel-test-playlist-add-sends-findadd ()
+ (let ((song (libmpdel--create-song-from-data
+               '((Title . "S")
+                 (Album . "A")
+                 (Artist . "Art")))))
+   (libmpdel-test--with-connection
+    (libmpdel-playlist-add song 'current-playlist)
+    (should (equal '("findadd artist \"Art\" album \"A\" title \"S\"")
+                   (last commands))))))
+
 
 ;;; Public functions
 
