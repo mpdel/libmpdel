@@ -129,13 +129,14 @@
 (defmacro libmpdel-test--with-connection (&rest body)
   "Execute BODY within a new fake MPD connection."
   `(let ((libmpdel--msghandlers (list))
-         (libmpdel--connection (list))
          (commands (list))
          (log (list)))
      (cl-letf (((symbol-function 'libmpdel--log)
                 (lambda (string type-string) (setq log (append log (list (cons string type-string))))))
                ((symbol-function 'libmpdel--raw-send-command)
-                (lambda (command) (setq commands (append commands (list command))))))
+                (lambda (command) (setq commands (append commands (list command)))))
+               ((symbol-function 'libmpdel-connected-p)
+                (lambda () t)))
        ,@body)))
 
 (ert-deftest libmpdel-test--raw-send-command-with-handler-with-a-string ()
@@ -325,6 +326,14 @@
     (should (libmpdel-equal song1-bis song1))
     (should (not (libmpdel-equal song1 song2)))
     (should (not (libmpdel-equal song2 song1)))))
+
+(ert-deftest libmpdel-test-playlist-add-artist-to-stored-playlist ()
+  (libmpdel-test--with-connection
+   (let ((artist (libmpdel--artist-create :name "The Artist"))
+         (playlist (libmpdel--stored-playlist-create :name "the playlist")))
+     (libmpdel-playlist-add artist playlist)
+     (should (equal (car (last commands))
+                    "searchaddpl \"the playlist\" artist \"The Artist\"")))))
 
 (provide 'libmpdel-test)
 ;;; libmpdel-test.el ends here
