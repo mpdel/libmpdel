@@ -228,6 +228,9 @@ message from the server.")
 (cl-defmethod libmpdel-entity-name ((_entity (eql artists)))
   "All artists")
 
+(cl-defmethod libmpdel-entity-name ((_entity (eql albums)))
+  "All albums")
+
 (cl-defmethod libmpdel-entity-name ((_entity (eql current-playlist)))
   "Current playlist")
 
