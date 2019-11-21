@@ -900,7 +900,7 @@ ENTITY can also be a list of entities to add.")
 (cl-defmethod libmpdel-playlist-add (entity (_ (eql current-playlist)))
   (let ((id (libmpdel-entity-id entity)))
     (libmpdel-send-command
-     (if id
+     (if (and (stringp id) (not (string-empty-p id)))
          `("addid %S" ,id)
        `("findadd %s" ,(libmpdel-entity-to-criteria entity))))))
 
