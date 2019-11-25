@@ -32,6 +32,7 @@
 (require 'time-stamp)
 (require 'tq)
 (require 'cl-lib)
+(require 'subr-x)
 
 
 ;;; Customization
