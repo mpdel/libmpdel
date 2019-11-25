@@ -262,6 +262,14 @@
     (should (equal '("addid \"gmusic:album:Bbtjr2k5632pgyabagduxcg3p4q\"")
                    (last commands))))))
 
+(ert-deftest libmpdel-test-playlist-add-no-string-id-sends-findadd ()
+  (let* ((artist (libmpdel--artist-create :name "The Artist"))
+         (album (libmpdel--album-create :name "The Album" :artist artist)))
+   (libmpdel-test--with-connection
+    (libmpdel-playlist-add album 'current-playlist)
+    (should (equal '("findadd artist \"The Artist\" album \"The Album\"")
+                   (last commands))))))
+
 (ert-deftest libmpdel-test-playlist-add-sends-findadd ()
  (let ((song (libmpdel--create-song-from-data
                '((Title . "S")
