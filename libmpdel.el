@@ -234,6 +234,10 @@ message from the server.")
   "Return SONG's name."
   (libmpdel--song-name song))
 
+(cl-defmethod libmpdel-entity-name ((_entity (eql stored-playlists)))
+  "Return a string describing the `stored-playlists' entity."
+  "Stored playlists")
+
 (cl-defmethod libmpdel-entity-name ((_entity (eql artists)))
   "Return a string describing the `artists' entity."
   "All artists")
