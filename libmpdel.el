@@ -554,6 +554,14 @@ bound containing the value to set."
       (setq libmpdel--play-state new-state)
       (run-hooks 'libmpdel-player-changed-hook))))
 
+(defun libmpdel-playing-p ()
+  "Return non-nil if player is playing, nil otherwise."
+  (eq 'play (libmpdel-play-state)))
+
+(defun libmpdel-paused-p ()
+  "Return non-nil if player is paused, nil otherwise."
+  (eq 'pause (libmpdel-play-state)))
+
 (defun libmpdel-stopped-p ()
   "Return non-nil if player is stopped, nil otherwise."
   (eq 'stop (libmpdel-play-state)))
