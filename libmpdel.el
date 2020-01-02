@@ -1,6 +1,6 @@
 ;;; libmpdel.el --- Communication with an MPD server  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2017-2018  Damien Cassou
+;; Copyright (C) 2017-2020  Damien Cassou
 
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Keywords: multimedia
@@ -864,11 +864,21 @@ If HANDLER is nil, ignore response."
                (lambda (artist-name) (libmpdel--artist-create :name artist-name))
                (libmpdel-sorted-entries data 'Artist))))))
 
+(defvar libmpdel--unknown-artist
+  (libmpdel--artist-create :name "")
+  "An anonymous artist instance.")
+
 (cl-defmethod libmpdel-list ((_entity (eql albums)) function)
-  "Call FUNCTION with all artists as parameter."
-  (libmpdel-list
-   'artists
-   (lambda (artists) (libmpdel-async-mapcan artists #'libmpdel-list function))))
+  "Call FUNCTION with all albums as parameter."
+  (libmpdel-send-command
+   "list album"
+   (lambda (data)
+     (funcall function
+              (mapcar
+               (lambda (album-name)
+                 (libmpdel--album-create :name album-name
+                                         :artist libmpdel--unknown-artist))
+               (libmpdel-sorted-entries data 'Album))))))
 
 (cl-defmethod libmpdel-list ((_entity (eql stored-playlists)) function)
   "Call FUNCTION with all stored playlists as parameter."
