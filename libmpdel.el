@@ -42,7 +42,14 @@
   :group 'comm)
 
 (defcustom libmpdel-hostname "localhost"
-  "MPD server location to connect to.  Also see `libmpdel-port'."
+  "MPD server location to connect to.  Also see `libmpdel-port'.
+If this string starts with a slash, it means connect to a local
+(a.k.a. unix) socket with such absolute pathname. Please see the
+MPD server documentation for server configuration info.
+
+The advantage of such a setup is that file and/or directory
+permission modes can be used to enforce access control,
+without the need for a password."
   :type 'string)
 
 (defcustom libmpdel-port 6600
