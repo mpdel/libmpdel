@@ -353,13 +353,21 @@ message from the server.")
   "Return the buffer associated with the connection process."
   (process-buffer (libmpdel--process)))
 
+(defsubst libmpdel--connection-address-local-p ()
+  "Return non-nil if the MPD server address is a local family address."
+  (eq ?/ (aref libmpdel-hostname 0)))
+
 (defsubst libmpdel--open-stream ()
   "Open and return connection to the MPD process."
-  (open-network-stream
-   "mpd" "*mpd*"
-   libmpdel-hostname
-   libmpdel-port
-   :type 'plain))
+  (if (not (libmpdel--connection-address-local-p))
+      (open-network-stream
+       "mpd" "*mpd*"
+       libmpdel-hostname
+       libmpdel-port
+       :type 'plain)
+    (make-network-process
+     :name "mpd" :buffer "*mpd*"
+     :family 'local :service  libmpdel-hostname)))
 
 (defun libmpdel--connect ()
   "Create a new connection with the MPD server."
