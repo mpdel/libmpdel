@@ -353,6 +353,14 @@ message from the server.")
   "Return the buffer associated with the connection process."
   (process-buffer (libmpdel--process)))
 
+(defsubst libmpdel--open-stream ()
+  "Open and return connection to the MPD process."
+  (open-network-stream
+   "mpd" "*mpd*"
+   libmpdel-hostname
+   libmpdel-port
+   :type 'plain))
+
 (defun libmpdel--connect ()
   "Create a new connection with the MPD server."
   ;; The *mpd* buffer will contain all the communication logs
@@ -362,11 +370,7 @@ message from the server.")
     (setq-local buffer-read-only t)
     (let ((inhibit-read-only t))
       (erase-buffer)))
-  (setq libmpdel--connection (tq-create (open-network-stream
-                                         "mpd" "*mpd*"
-                                         libmpdel-hostname
-                                         libmpdel-port
-                                         :type 'plain)))
+  (setq libmpdel--connection (tq-create (libmpdel--open-stream)))
   (set-process-coding-system (libmpdel--process) 'utf-8-unix 'utf-8-unix)
   (set-process-query-on-exit-flag (libmpdel--process) nil)
   ;; Take care of the initial welcome message from server that we
