@@ -49,14 +49,42 @@
   "MPD server port to connect to.  Also see `libmpdel-hostname'."
   :type 'integer)
 
-(defcustom libmpdel-profiles (list (list "Local server" libmpdel-hostname libmpdel-port))
-  "List of (HOST . PORT) when using several MPD servers."
+(defcustom libmpdel-service 6600
+  "MPD service to connect to.  Also see `libmpdel-hostname'.
+
+This value should be an integer port number (e.g., 6600), an
+integer string port number (e.g., \"6600\"), or a absolute socket
+path (e.g., \"/run/user/${user-id}/xmpd/socket\")."
+  :type '(choice string integer))
+
+(define-obsolete-variable-alias 'libmpdel-port 'libmpdel-service "2020-09-02"
+  "Port and service when using `make-network-process' are
+  synomous when using port number values.  However, since socket
+  connection support is being added, prefer the `limpdel-service'
+  name to better align with `make-network-process' and be more
+  semantically meaningful.")
+
+(defcustom libmpdel-family 'ipv4
+  "Address and protocol family for MPD service connection.
+
+Supported symbol values include:
+  local -- for a local (i.e. UNIX) address specified by SERVICE.
+  ipv4  -- use IPv4 address family only.
+  ipv6  -- use IPv6 address family only.
+
+See `make-network-process' for more information."
+  :type 'symbol)
+
+(defcustom libmpdel-profiles (list(list "Local server" libmpdel-hostname libmpdel-port libmpdel-family))
+  "List of (HOST . SERVICE . FAMILY) when using several MPD servers."
   :type '(repeat (list
                   :tag "Profile"
-                  :value ("Local server" "localhost" 6600)
+                  :value ("Local server" "localhost" 6600 ipv4)
                   (string :tag "name")
                   (string :tag "host")
-                  (integer :tag "port"))))
+                  (choice (integer :tag "port")
+                          (string :tag "service"))
+                  (symbol :tag "family"))))
 
 (defcustom libmpdel-music-directory "~/Music"
   "MPD `music_directory' variable's value.
@@ -362,11 +390,16 @@ message from the server.")
     (setq-local buffer-read-only t)
     (let ((inhibit-read-only t))
       (erase-buffer)))
-  (setq libmpdel--connection (tq-create (open-network-stream
-                                         "mpd" "*mpd*"
-                                         libmpdel-hostname
-                                         libmpdel-port
-                                         :type 'plain)))
+  (let ((connection-args (list :name "mpd"
+                               :buffer "*mpd*"
+                               :service libmpdel-service
+                               :family libmpdel-family
+                               :type nil)))
+    ;; If `libmpdel-service' is an integer or integer string, append the
+    ;; hostname to connection arguments
+    (if (or (integerp libmpdel-service) (not (= 0 (string-to-number libmpdel-service))))
+      (setq connection-args (append connection-args (list :host libmpdel-hostname))))
+    (setq libmpdel--connection (tq-create (apply #'make-network-process connection-args))))
   (set-process-coding-system (libmpdel--process) 'utf-8-unix 'utf-8-unix)
   (set-process-query-on-exit-flag (libmpdel--process) nil)
   ;; Take care of the initial welcome message from server that we
@@ -388,7 +421,8 @@ Interactively, let the user choose PROFILE from `libmpdel-profiles'.
 If a connection already exists, terminate it first."
   (interactive (list (libmpdel--select-profile)))
   (let* ((libmpdel-hostname (cl-second profile))
-         (libmpdel-port (cl-third profile)))
+         (libmpdel-service (cl-third profile))
+         (libmpdel-family (cl-fourth profile)))
     (when (libmpdel-connected-p)
       (libmpdel-disconnect))
     (libmpdel--connect)))
