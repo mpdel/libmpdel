@@ -374,11 +374,13 @@ message from the server.")
 (defsubst libmpdel--open-stream ()
   "Open and return connection to the MPD process."
   (if (not (libmpdel--connection-address-local-p))
-      (open-network-stream
-       "mpd" "*mpd*"
-       libmpdel-hostname
-       libmpdel-port
-       :type 'plain)
+      (make-network-process
+       :name "mpd"
+       :buffer "*mpd*"
+       :host libmpdel-hostname
+       :service libmpdel-port
+       :family libmpdel-family
+       :type nil)
     (make-network-process
      :name "mpd" :buffer "*mpd*"
      :family 'local :service  libmpdel-hostname)))
