@@ -63,14 +63,16 @@ For more information see `libmpdel-hostname'."
   :type '(choice (const :tag "IPv4" ipv4)
                  (const :tag "IPv6" ipv6)))
 
-(defcustom libmpdel-profiles (list (list "Local server" libmpdel-hostname libmpdel-port))
-  "List of (NAME HOST . PORT) when using several MPD servers."
+(defcustom libmpdel-profiles (list (list "Local server" libmpdel-hostname libmpdel-port libmpdel-family))
+  "List of (NAME HOST PORT . FAMILY) when using several MPD servers."
   :type '(repeat (list
                   :tag "Profile"
                   :value ("Local server" "localhost" 6600)
                   (string :tag "name")
                   (string :tag "host")
-                  (integer :tag "port"))))
+                  (integer :tag "port")
+                  (choice (const :tag "IPv4" ipv4)
+                          (const :tag "IPv6" ipv6)))))
 
 (defcustom libmpdel-music-directory "~/Music"
   "MPD `music_directory' variable's value.
@@ -416,7 +418,8 @@ Interactively, let the user choose PROFILE from `libmpdel-profiles'.
 If a connection already exists, terminate it first."
   (interactive (list (libmpdel--select-profile)))
   (let* ((libmpdel-hostname (cl-second profile))
-         (libmpdel-port (cl-third profile)))
+         (libmpdel-port (cl-third profile))
+         (libmpdel-family (cl-fourth profile)))
     (when (libmpdel-connected-p)
       (libmpdel-disconnect))
     (libmpdel--connect)))
