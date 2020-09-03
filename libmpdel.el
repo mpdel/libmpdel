@@ -56,6 +56,13 @@ without the need for a password."
   "MPD server port to connect to.  Also see `libmpdel-hostname'."
   :type 'integer)
 
+(defcustom libmpdel-family 'ipv4
+  "MPD address family when connecting via TCP connections.
+
+For more information see `libmpdel-hostname'."
+  :type '(choice (const :tag "IPv4" ipv4)
+                 (const :tag "IPv6" ipv6)))
+
 (defcustom libmpdel-profiles (list (list "Local server" libmpdel-hostname libmpdel-port))
   "List of (HOST . PORT) when using several MPD servers."
   :type '(repeat (list
