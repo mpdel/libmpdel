@@ -64,7 +64,7 @@ For more information see `libmpdel-hostname'."
                  (const :tag "IPv6" ipv6)))
 
 (defcustom libmpdel-profiles (list (list "Local server" libmpdel-hostname libmpdel-port))
-  "List of (HOST . PORT) when using several MPD servers."
+  "List of (NAME HOST . PORT) when using several MPD servers."
   :type '(repeat (list
                   :tag "Profile"
                   :value ("Local server" "localhost" 6600)
