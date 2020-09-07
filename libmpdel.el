@@ -44,8 +44,8 @@
 (defcustom libmpdel-hostname "localhost"
   "MPD server location to connect to.  Also see `libmpdel-port'.
 If this string starts with a slash, it means connect to a local
-(a.k.a. unix) socket with such absolute pathname. Please see the
-MPD server documentation for server configuration info.
+Unix socket with such absolute filename.  Please see the MPD
+server documentation for server configuration info.
 
 The advantage of such a setup is that file and/or directory
 permission modes can be used to enforce access control,
@@ -77,7 +77,7 @@ For more information see `libmpdel-hostname'."
 (defcustom libmpdel-music-directory "~/Music"
   "MPD `music_directory' variable's value.
 
-This is used to map MPD's music files to the filesystem."
+This is used to map MPD's music files to the file-system."
   :type 'directory)
 
 (defcustom libmpdel-current-playlist-changed-hook nil
@@ -107,7 +107,7 @@ See `libmpdel-current-song-id'."
 
 (defvar libmpdel--connection nil
   "Current connection to the MPD server.
-The logs of this connection are accessible in the *mpd* buffer.")
+The logs of this connection are accessible in the `*mpd*' buffer.")
 
 (defconst libmpdel--response-regexp
   (rx line-start
@@ -150,10 +150,10 @@ notifications in the server.  When we want to send a command to
 the server (for example to change the current song), we always
 have to (1) cancel the IDLE first (with a \"noidle\"
 command), (2) send the command we want, and (3) send the IDLE
-command again.  Cancelling the current \"idle\" command is done
+command again.  Canceling the current \"idle\" command is done
 in `mpdel-send-command'.  Sending \"idle\" again is done in the
 handler for \"idle\" that will be triggered when the empty answer
-for the cancelled \"idle\" arrives.
+for the canceled \"idle\" arrives.
 
 Because MPD answers in the order the commands are sent, we know
 that the first handler is the one to execute when we receive a
@@ -236,7 +236,7 @@ message from the server.")
   (libmpdel--song-album song))
 
 (cl-defgeneric libmpdel-entity-name (entity)
-  "Return basename of ENTITY.")
+  "Return the name of ENTITY.")
 
 (cl-defmethod libmpdel-entity-name ((artist libmpdel-artist))
   "Return ARTIST's name."
@@ -562,7 +562,7 @@ VALUE-DESC is a string describing the kind of value accepted for
 this state.
 
 SET-BODY is a list of forms to put in the generated setter
-function.  During executiong of SET-BODY, a variable NEW-VALUE is
+function.  During execution of SET-BODY, a variable NEW-VALUE is
 bound containing the value to set."
   (declare (indent 1))
   `(progn
@@ -636,7 +636,7 @@ bound containing the value to set."
          (t 'never))))
 
 (defun libmpdel-time-to-string (time)
-  "Return a string represeting TIME, a number in a string."
+  "Return a string representing TIME, a number in a string."
   (if (not time)
       "0"
     (let* ((time (string-to-number time))
@@ -1221,3 +1221,5 @@ not specify it, everything is updated."
 ;; Local Variables:
 ;; checkdoc-arguments-in-order-flag: nil
 ;; End:
+
+; LocalWords:  mpd noidle
