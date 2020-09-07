@@ -56,14 +56,23 @@ without the need for a password."
   "MPD server port to connect to.  Also see `libmpdel-hostname'."
   :type 'integer)
 
-(defcustom libmpdel-profiles (list (list "Local server" libmpdel-hostname libmpdel-port))
-  "List of (HOST . PORT) when using several MPD servers."
+(defcustom libmpdel-family 'ipv4
+  "MPD address family when connecting via TCP connections.
+
+For more information see `libmpdel-hostname'."
+  :type '(choice (const :tag "IPv4" ipv4)
+                 (const :tag "IPv6" ipv6)))
+
+(defcustom libmpdel-profiles (list (list "Local server" libmpdel-hostname libmpdel-port libmpdel-family))
+  "List of (NAME HOST PORT . FAMILY) when using several MPD servers."
   :type '(repeat (list
                   :tag "Profile"
                   :value ("Local server" "localhost" 6600)
                   (string :tag "name")
                   (string :tag "host")
-                  (integer :tag "port"))))
+                  (integer :tag "port")
+                  (choice (const :tag "IPv4" ipv4)
+                          (const :tag "IPv6" ipv6)))))
 
 (defcustom libmpdel-music-directory "~/Music"
   "MPD `music_directory' variable's value.
@@ -367,11 +376,13 @@ message from the server.")
 (defsubst libmpdel--open-stream ()
   "Open and return connection to the MPD process."
   (if (not (libmpdel--connection-address-local-p))
-      (open-network-stream
-       "mpd" "*mpd*"
-       libmpdel-hostname
-       libmpdel-port
-       :type 'plain)
+      (make-network-process
+       :name "mpd"
+       :buffer "*mpd*"
+       :host libmpdel-hostname
+       :service libmpdel-port
+       :family libmpdel-family
+       :type nil)
     (make-network-process
      :name "mpd" :buffer "*mpd*"
      :family 'local :service  libmpdel-hostname)))
@@ -407,7 +418,8 @@ Interactively, let the user choose PROFILE from `libmpdel-profiles'.
 If a connection already exists, terminate it first."
   (interactive (list (libmpdel--select-profile)))
   (let* ((libmpdel-hostname (cl-second profile))
-         (libmpdel-port (cl-third profile)))
+         (libmpdel-port (cl-third profile))
+         (libmpdel-family (cl-fourth profile)))
     (when (libmpdel-connected-p)
       (libmpdel-disconnect))
     (libmpdel--connect)))
