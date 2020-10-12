@@ -7,13 +7,8 @@ platform:
 
 steps:
 - name: check
-  image: ubuntu:latest
+  image: silex/emacs:27.1-dev
   commands:
-  - apt-get update
-  - apt-get install -y software-properties-common coreutils make gnutls-bin curl
-  - add-apt-repository ppa:kelleyk/emacs -y
-  - apt-get update
-  - apt-get install -y emacs26
   - emacs --version
   - make ci-dependencies
   - make check
