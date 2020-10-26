@@ -17,7 +17,7 @@
 The package libmpdel is an Emacs library client to communicate with
 [[https://www.musicpd.org/][Music Player Daemon]] (MPD), a flexible, powerful, server-side
 application for playing music. For a user interface, please check the
-[[https://gitlab.petton.fr/mpdel/mpdel][mpdel]] project instead (which depends on this one).
+[[https://gitea.petton.fr/mpdel/mpdel][mpdel]] project instead (which depends on this one).
 
 ** Installing
 
@@ -37,21 +37,21 @@ a look at it.
 
 The library is implemented around a set of entities.
 
-| *Name*             | *Type*      | *Fields*               | *Description*                                           |
-|------------------+-----------+----------------------+-------------------------------------------------------|
-| song             | structure | name, album, file, … |                                                       |
-| album            | structure | name, artist         |                                                       |
-| artist           | structure | name                 |                                                       |
-| directory        | structure | name, path           |                                                       |
-| stored-playlist  | structure | name                 | A named user-specified sequence of songs              |
-| search-criteria  | structure | type, what           | Read the [[https://www.musicpd.org/doc/protocol/database.html][protocol documentation]]                       |
-| filter           | structure | text                 | Read the [[https://www.musicpd.org/doc/html/protocol.html#filters][protocol documentation]]                       |
-|------------------+-----------+----------------------+-------------------------------------------------------|
-| artists          | symbol    | /none/                 | Represent the set of all artists                      |
-| albums           | symbol    | /none/                 | Represent the set of all albums                       |
-| directories      | symbol    | /none/                 | Represent all directories in ~libmpdel-music-directory~ |
-| current-playlist | symbol    | /none/                 | Represent the currently played sequence of songs      |
-| stored-playlists | symbol    | /none/                 | Represent the set of all stored playlists             |
+| *Name*           | *Type*    | *Fields*             | *Description*                                           |
+|------------------+-----------+----------------------+---------------------------------------------------------|
+| song             | structure | name, album, file, … |                                                         |
+| album            | structure | name, artist         |                                                         |
+| artist           | structure | name                 |                                                         |
+| directory        | structure | name, path           |                                                         |
+| stored-playlist  | structure | name                 | A named user-specified sequence of songs                |
+| search-criteria  | structure | type, what           | Read the [[https://www.musicpd.org/doc/protocol/database.html][protocol documentation]]                         |
+| filter           | structure | text                 | Read the [[https://www.musicpd.org/doc/html/protocol.html#filters][protocol documentation]]                         |
+|------------------+-----------+----------------------+---------------------------------------------------------|
+| artists          | symbol    | /none/               | Represent the set of all artists                        |
+| albums           | symbol    | /none/               | Represent the set of all albums                         |
+| directories      | symbol    | /none/               | Represent all directories in ~libmpdel-music-directory~ |
+| current-playlist | symbol    | /none/               | Represent the currently played sequence of songs        |
+| stored-playlists | symbol    | /none/               | Represent the set of all stored playlists               |
 
 Many functions in MPDel work on several kinds of entities (e.g.,
 ~libmpdel-list~). These methods are implemented with ~cl-defgeneric~
