@@ -1049,6 +1049,14 @@ ENTITY can also be a list of entities to add.")
                    song-position))
          song-positions))))))
 
+(defun libmpdel-stored-playlists-delete (stored-playlists)
+  "Remove STORED-PLAYLISTS."
+  (libmpdel-send-commands
+   (mapcar
+    (lambda (s)
+      (format "rm %S" (libmpdel-entity-name s)))
+    stored-playlists)))
+
 (defun libmpdel-playlist-move-up (songs)
   "Move up SONGS in current playlist."
   ;; We should move up from first in playlist to last
