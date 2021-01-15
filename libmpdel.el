@@ -646,17 +646,22 @@ bound containing the value to set."
 
 (defun libmpdel-completing-read (prompt entities &optional transformer)
   "PROMPT user to select one entity among ENTITIES.
+Return the selected entity.
 
 Transform each entity to a string with TRANSFORMER,
-`libmpdel-entity-name' if nil."
+`libmpdel-entity-name' if nil.
+
+The user is allowed to exit by typing a string not matching any
+entity.  In this case, the user must confirm and the typed string
+is returned."
   (let* ((transformer (or transformer #'libmpdel-entity-name))
          (map (make-hash-table :test 'equal :size (length entities)))
          (entity-strings (mapcar (lambda (entity) (funcall transformer entity)) entities)))
     (cl-mapcar (lambda (entity entity-string)
                  (puthash entity-string entity map))
                entities entity-strings)
-    (let ((entity-string (completing-read prompt entity-strings nil t)))
-      (gethash entity-string map))))
+    (let ((entity-string (completing-read prompt entity-strings nil 'confirm)))
+      (gethash entity-string map entity-string))))
 
 (defun libmpdel-completing-read-entity (function prompt entity &optional transformer)
   "Call FUNCTION after prompting for an element of ENTITY.
@@ -671,9 +676,18 @@ Pass PROMPT, the elements of ENTITY and TRANSFORMER to
 
 (defun libmpdel-funcall-on-stored-playlist (function)
   "Pass a stored playlist as parameter to FUNCTION.
-The user is asked to choose for a stored playlist first."
+The user is asked to choose for a stored playlist first.
+
+The user is allowed to enter a name for a non-existing stored
+playlist.  In this case, the user must confirm and the stored
+playlist is created before being passed as parameter to
+FUNCTION."
   (libmpdel-completing-read-entity
-   function
+   (lambda (stored-playlist)
+     (let ((stored-playlist (if (stringp stored-playlist)
+                                (libmpdel--stored-playlist-create :name stored-playlist)
+                              stored-playlist)))
+       (funcall function stored-playlist)))
    "Stored playlist: "
    'stored-playlists))
 
