@@ -247,8 +247,11 @@ message from the server.")
   (libmpdel--album-name album))
 
 (cl-defmethod libmpdel-entity-name ((song libmpdel-song))
-  "Return SONG's name."
-  (libmpdel--song-name song))
+  "Return SONG's name.
+
+If the SONG's name is nil, return the filename instead."
+  (or (libmpdel--song-name song)
+      (libmpdel--song-file song)))
 
 (cl-defmethod libmpdel-entity-name ((_entity (eql stored-playlists)))
   "Return a string describing the `stored-playlists' entity."
