@@ -638,6 +638,18 @@ bound containing the value to set."
          ((string= new-value "1") 'forever)
          (t 'never))))
 
+(defun libmpdel-get-state (state handler)
+  "Run HANDLER synchronously after STATE is get.
+
+States are get async asynchronously at the meantime connecting to mpd.  However,
+if an action with state is called with establishing connection, it will be
+failed due to the state is nil."
+  (let* ((fstate (intern (format "libmpdel-%s" state)))
+         (call-handler (lambda () (funcall handler (funcall fstate)))))
+    (if (and (funcall fstate) (libmpdel-connected-p))
+        (funcall call-handler)
+      (libmpdel-refresh-status call-handler))))
+
 (defun libmpdel-time-to-string (time)
   "Return a string representing TIME, a number in a string."
   (if (not time)
@@ -1150,11 +1162,13 @@ ENTITY can also be a list of entities to add.")
   "Toggle between play and pause.
 See also `libmpdel-playback-stop'."
   (interactive)
-  (libmpdel-send-command
-   (cl-case libmpdel--play-state
-     (play "pause 1")
-     (pause "pause 0")
-     (stop "play"))))
+  (libmpdel-get-state 'play-state
+    (lambda (play-state)
+      (libmpdel-send-command
+       (cl-case play-state
+         (play "pause 1")
+         (pause "pause 0")
+         (stop "play"))))))
 
 ;;;###autoload
 (defun libmpdel-playback-seek (time &optional handler)
@@ -1221,9 +1235,14 @@ the current playlist."
 
 ;;; Status queries
 
-(defun libmpdel-refresh-status ()
-  "Ask the server for its current status."
-  (libmpdel-send-command "status" #'libmpdel--msghandler-status))
+(defun libmpdel-refresh-status (&optional handler)
+  "Ask the server for its current status.
+
+If HANDLER is not nil, it will be called after refreshing."
+  (libmpdel-send-command "status"
+                         (lambda (&rest args)
+                           (apply #'libmpdel--msghandler-status args)
+                           (when handler (funcall handler)))))
 
 
 ;;; Database queries
