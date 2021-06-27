@@ -94,6 +94,11 @@
     (should (equal "The song" (libmpdel-entity-name song)))
     (should (equal "The playlist" (libmpdel-entity-name stored-playlist)))))
 
+(ert-deftest libmpdel-test-entity-name-song-defaults-file ()
+  (let ((song (libmpdel--create-song-from-data
+               '((file . "foo/song.ogg")))))
+    (should (equal "foo/song.ogg" (libmpdel-entity-name song)))))
+
 (ert-deftest libmpdel-test-entity-parent ()
   (let* ((artist (libmpdel--artist-create :name "The Artist"))
          (album (libmpdel--album-create :name "The Album" :artist artist))
