@@ -659,7 +659,7 @@ failed due to the state is nil."
            (minutes (/ (- time seconds) 60)))
       (format "%02d:%02d" (truncate minutes) (truncate seconds)))))
 
-(defun libmpdel-completing-read (prompt entities)
+(cl-defun libmpdel-completing-read (prompt entities &key category)
   "PROMPT user to select one entity among ENTITIES.
 Return the selected entity.
 
@@ -667,13 +667,23 @@ Transform each entity to a string with `libmpdel-entity-name'.
 
 The user is allowed to exit by typing a string not matching any
 entity.  In this case, the user must confirm and the typed string
-is returned."
+is returned.
+
+CATEGORY may be used to specify the type of object being listed.
+This is used by some packages to show additional information
+about each candidate or to provide contextual menus."
   (let* ((map (make-hash-table :test 'equal :size (length entities)))
          (entity-strings (mapcar (lambda (entity) (funcall #'libmpdel-entity-name entity)) entities)))
     (cl-mapcar (lambda (entity entity-string)
                  (puthash entity-string entity map))
                entities entity-strings)
-    (let ((entity-string (completing-read prompt entity-strings nil 'confirm)))
+    (let ((entity-string (completing-read prompt
+                                          (lambda (string predicate action)
+                                            (if (eq action 'metadata)
+                                                (list 'metadata (when category (cons 'category category)))
+                                              (complete-with-action
+                                               action entity-strings string predicate)))
+                                          nil 'confirm)))
       (gethash entity-string map entity-string))))
 
 (defun libmpdel-completing-read-entity (function prompt entity &rest rest)
