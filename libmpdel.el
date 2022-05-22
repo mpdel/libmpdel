@@ -705,7 +705,7 @@ FUNCTION."
    'stored-playlists))
 
 (defun libmpdel-current-playlist-add (entity)
-  "Add ENTITY to a current playlist.
+  "Add ENTITY to the current playlist.
 
 ENTITY can also be a list of entities to add."
   (libmpdel-playlist-add entity 'current-playlist))
