@@ -676,7 +676,7 @@ is returned."
     (let ((entity-string (completing-read prompt entity-strings nil 'confirm)))
       (gethash entity-string map entity-string))))
 
-(defun libmpdel-completing-read-entity (function prompt entity)
+(defun libmpdel-completing-read-entity (function prompt entity &rest rest)
   "Call FUNCTION after prompting for an element of ENTITY.
 
 Pass PROMPT and the elements of ENTITY to
@@ -685,7 +685,7 @@ Pass PROMPT and the elements of ENTITY to
    entity
    (lambda (entities)
      (funcall function
-              (libmpdel-completing-read prompt entities)))))
+              (apply #'libmpdel-completing-read prompt entities rest)))))
 
 (defun libmpdel-funcall-on-stored-playlist (function)
   "Pass a stored playlist as parameter to FUNCTION.
