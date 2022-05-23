@@ -671,9 +671,17 @@ is returned.
 
 CATEGORY may be used to specify the type of object being listed.
 This is used by some packages to show additional information
-about each candidate or to provide contextual menus."
+about each candidate or to provide contextual menus.
+
+The string representation of each element of ENTITIES include the
+`libmpdel-entity' text property whose value is the entity
+represented by the string.  This is useful for the tools working
+directly on the completion candidates (such as embark)."
   (let* ((map (make-hash-table :test 'equal :size (length entities)))
-         (entity-strings (mapcar (lambda (entity) (funcall #'libmpdel-entity-name entity)) entities)))
+         (entity-strings (mapcar (lambda (entity) (propertize
+                                                   (funcall #'libmpdel-entity-name entity)
+                                                   'libmpdel-entity entity))
+                                 entities)))
     (cl-mapcar (lambda (entity entity-string)
                  (puthash entity-string entity map))
                entities entity-strings)
