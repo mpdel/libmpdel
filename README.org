@@ -1,23 +1,26 @@
 * libmpdel
+  #+BEGIN_HTML
+      <p>
+        <a href="https://stable.melpa.org/#/libmpdel">
+          <img alt="MELPA Stable" src="https://stable.melpa.org/packages/libmpdel-badge.svg"/>
+        </a>
 
-  <a href="https://stable.melpa.org/#/libmpdel">
-    <img alt="MELPA Stable" src="https://stable.melpa.org/packages/libmpdel-badge.svg"/>
-  </a>
-  <a href="https://melpa.org/#/libmpdel">
-    <img alt="MELPA" src="https://melpa.org/packages/libmpdel-badge.svg"/>
-  </a>
-  <a href="https://drone.petton.fr/mpdel/libmpdel">
-    <img src="https://drone.petton.fr/api/badges/mpdel/libmpdel/status.svg" />
-  </a>
-</p>
+        <a href="https://melpa.org/#/libmpdel">
+          <img alt="MELPA" src="https://melpa.org/packages/libmpdel-badge.svg"/>
+        </a>
 
+        <a href="https://github.com/mpdel/libmpdel/actions">
+          <img alt="pipeline status" src="https://github.com/mpdel/libmpdel/actions/workflows/test.yml/badge.svg" />
+        </a>
+      </p>
+  #+END_HTML
 
 ** Summary
 
 The package libmpdel is an Emacs library client to communicate with
 [[https://www.musicpd.org/][Music Player Daemon]] (MPD), a flexible, powerful, server-side
 application for playing music. For a user interface, please check the
-[[https://gitea.petton.fr/mpdel/mpdel][mpdel]] project instead (which depends on this one).
+[[https://github.com/mpdel/mpdel][mpdel]] project instead (which depends on this one).
 
 ** Installing
 
