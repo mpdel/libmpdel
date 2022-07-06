@@ -659,35 +659,51 @@ failed due to the state is nil."
            (minutes (/ (- time seconds) 60)))
       (format "%02d:%02d" (truncate minutes) (truncate seconds)))))
 
-(defun libmpdel-completing-read (prompt entities &optional transformer)
+(cl-defun libmpdel-completing-read (prompt entities &key category)
   "PROMPT user to select one entity among ENTITIES.
 Return the selected entity.
 
-Transform each entity to a string with TRANSFORMER,
-`libmpdel-entity-name' if nil.
+Transform each entity to a string with `libmpdel-entity-name'.
 
 The user is allowed to exit by typing a string not matching any
 entity.  In this case, the user must confirm and the typed string
-is returned."
-  (let* ((transformer (or transformer #'libmpdel-entity-name))
-         (map (make-hash-table :test 'equal :size (length entities)))
-         (entity-strings (mapcar (lambda (entity) (funcall transformer entity)) entities)))
+is returned.
+
+CATEGORY may be used to specify the type of object being listed.
+This is used by some packages to show additional information
+about each candidate or to provide contextual menus.
+
+The string representation of each element of ENTITIES include the
+`libmpdel-entity' text property whose value is the entity
+represented by the string.  This is useful for the tools working
+directly on the completion candidates (such as embark)."
+  (let* ((map (make-hash-table :test 'equal :size (length entities)))
+         (entity-strings (mapcar (lambda (entity) (propertize
+                                                   (funcall #'libmpdel-entity-name entity)
+                                                   'libmpdel-entity entity))
+                                 entities)))
     (cl-mapcar (lambda (entity entity-string)
                  (puthash entity-string entity map))
                entities entity-strings)
-    (let ((entity-string (completing-read prompt entity-strings nil 'confirm)))
+    (let ((entity-string (completing-read prompt
+                                          (lambda (string predicate action)
+                                            (if (eq action 'metadata)
+                                                (list 'metadata (when category (cons 'category category)))
+                                              (complete-with-action
+                                               action entity-strings string predicate)))
+                                          nil 'confirm)))
       (gethash entity-string map entity-string))))
 
-(defun libmpdel-completing-read-entity (function prompt entity &optional transformer)
+(defun libmpdel-completing-read-entity (function prompt entity &rest rest)
   "Call FUNCTION after prompting for an element of ENTITY.
 
-Pass PROMPT, the elements of ENTITY and TRANSFORMER to
+Pass PROMPT and the elements of ENTITY to
 `libmpdel-completing-read'."
   (libmpdel-list
    entity
    (lambda (entities)
      (funcall function
-              (libmpdel-completing-read prompt entities transformer)))))
+              (apply #'libmpdel-completing-read prompt entities rest)))))
 
 (defun libmpdel-funcall-on-stored-playlist (function)
   "Pass a stored playlist as parameter to FUNCTION.
@@ -707,7 +723,7 @@ FUNCTION."
    'stored-playlists))
 
 (defun libmpdel-current-playlist-add (entity)
-  "Add ENTITY to a current playlist.
+  "Add ENTITY to the current playlist.
 
 ENTITY can also be a list of entities to add."
   (libmpdel-playlist-add entity 'current-playlist))
