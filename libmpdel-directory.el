@@ -71,7 +71,7 @@
   (declare-function dired-jump "dired-x"))
 
 (cl-defmethod libmpdel-dired ((dir libmpdel-directory))
-  "Jump, using dired, to DIR's local directory."
+  "Jump, using `dired', to DIR's local directory."
   (require 'dired-x)
   (dired-jump t (expand-file-name (libmpdel--directory-path dir)
                                   libmpdel-music-directory)))
