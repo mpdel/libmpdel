@@ -64,9 +64,10 @@ and ~cl-defmethod~.
 
 See [[file:COPYING][COPYING]]. Copyright (c) 2018 Damien Cassou.
 
+#+BEGIN_HTML
 <a href="https://liberapay.com/DamienCassou/donate">
   <img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg">
 </a>
-
+#+END_HTML
 
 #  LocalWords:  MPDel MPD minibuffer
