@@ -4,7 +4,7 @@
 
 ;; Author: Jose A Ortega <jao@gnu.org>
 ;; Keywords: multimedia
-;; Url: https://gitea.petton.fr/mpdel/libmpdel
+;; Url: https://github.com/mpdel/libmpdel
 ;; Package-requires: ((emacs "25.1"))
 ;; Version: 1.2.0
 
@@ -71,7 +71,7 @@
   (declare-function dired-jump "dired-x"))
 
 (cl-defmethod libmpdel-dired ((dir libmpdel-directory))
-  "Jump, using dired, to DIR's local directory."
+  "Jump, using `dired', to DIR's local directory."
   (require 'dired-x)
   (dired-jump t (expand-file-name (libmpdel--directory-path dir)
                                   libmpdel-music-directory)))

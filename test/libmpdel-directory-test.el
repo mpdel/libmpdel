@@ -3,7 +3,7 @@
 ;; Copyright (C) 2019  Damien Cassou
 
 ;; Author: Jose A Ortega <jao@gnu.org>
-;; Url: https://gitea.petton.fr/mpdel/mpdel
+;; Url: https://github.com/mpdel/mpdel
 ;; Package-requires: ((emacs "25.1"))
 ;; Version: 1.2.0
 
