@@ -6,7 +6,7 @@
 ;; Keywords: multimedia
 ;; Url: https://github.com/mpdel/libmpdel
 ;; Package-requires: ((emacs "25.1"))
-;; Version: 1.3.1
+;; Version: 2.0.0
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
