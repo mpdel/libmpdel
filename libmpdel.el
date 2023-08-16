@@ -1,6 +1,6 @@
 ;;; libmpdel.el --- Communication with an MPD server  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2017-2021  Damien Cassou
+;; Copyright (C) 2017-2023  Damien Cassou
 
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Keywords: multimedia

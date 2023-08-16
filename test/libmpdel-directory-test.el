@@ -1,6 +1,6 @@
 ;;; libmpdel-directory-test.el --- Tests for libmpdel.el        -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2019  Damien Cassou
+;; Copyright (C) 2019-2023  Damien Cassou
 
 ;; Author: Jose A Ortega <jao@gnu.org>
 ;; Url: https://github.com/mpdel/mpdel
