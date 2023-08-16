@@ -1,6 +1,6 @@
 ;;; libmpdel-test.el --- Tests for libmpdel.el        -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2017  Damien Cassou
+;; Copyright (C) 2017-2023  Damien Cassou
 
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Url: https://github.com/mpdel/mpdel

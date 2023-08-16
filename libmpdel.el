@@ -1,6 +1,6 @@
 ;;; libmpdel.el --- Communication with an MPD server  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2017-2021  Damien Cassou
+;; Copyright (C) 2017-2023  Damien Cassou
 
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Keywords: multimedia
@@ -270,7 +270,7 @@ If the SONG's name is nil, return the filename instead."
   "Current playlist")
 
 (cl-defmethod libmpdel-entity-name ((stored-playlist libmpdel-stored-playlist))
-  "Return STORED-PLAYLIST's name."
+  "Return name of STORED-PLAYLIST."
   (libmpdel--stored-playlist-name stored-playlist))
 
 (cl-defmethod libmpdel-entity-name ((search-criteria libmpdel-search-criteria))
@@ -543,7 +543,7 @@ command."
   (save-match-data
     (with-temp-buffer
       (insert message)
-      (let ((end-of-message (point-at-bol))
+      (let ((end-of-message (line-beginning-position))
             (data nil))
         (goto-char (point-min))
         (while (re-search-forward libmpdel--msgfield-regexp end-of-message t)
@@ -639,11 +639,14 @@ bound containing the value to set."
          (t 'never))))
 
 (defun libmpdel-get-state (state handler)
-  "Run HANDLER synchronously after STATE is get.
+  "Run HANDLER, a function, passing the value for STATE as argument.
 
-States are get async asynchronously at the meantime connecting to mpd.  However,
-if an action with state is called with establishing connection, it will be
-failed due to the state is nil."
+STATE is one of the following symbols: \\=`playlist-length',
+\\=`volume', \\=`random', \\=`repeat' or \\=`single'.
+
+If the server's status is available, HANDLER is called
+synchronously.  Otherwise, HANDLER is called asynchronously when
+the response for status information comes back."
   (let* ((fstate (intern (format "libmpdel-%s" state)))
          (call-handler (lambda () (funcall handler (funcall fstate)))))
     (if (and (funcall fstate) (libmpdel-connected-p))
