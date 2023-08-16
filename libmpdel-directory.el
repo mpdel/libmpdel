@@ -77,7 +77,7 @@
                                   libmpdel-music-directory)))
 
 (cl-defmethod libmpdel-entity-parent ((dir libmpdel-directory))
-  "Return the directory containing DIR, or 'directories."
+  "Return the directory containing DIR, or the symbol \\=`directories'."
   (let ((path (file-name-directory (libmpdel--directory-path dir))))
     (if (> (length path) 1)
         (libmpdel--directory-create :path (substring path 0 -1))
