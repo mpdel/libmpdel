@@ -116,10 +116,13 @@
   (let ((song (libmpdel--create-song-from-data
                '((Title . "The song")
                  (file . "foo/song.ogg")
+                 (Date . "1970-01-01")
                  (Album . "The Album")
                  (Artist . "The Artist")))))
     (should (equal "The song" (libmpdel-entity-name song)))
     (should (equal "foo/song.ogg" (libmpdel-song-file song)))
+    (should (equal "1970-01-01" (libmpdel-entity-date song)))
+    (should (equal "1970-01-01" (libmpdel-entity-date (libmpdel-album song))))
     (should (equal "The Album" (libmpdel-entity-name (libmpdel-album song))))
     (should (equal "The Artist" (libmpdel-entity-name (libmpdel-artist (libmpdel-album song)))))))
 
