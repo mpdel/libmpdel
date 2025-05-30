@@ -183,6 +183,7 @@ message from the server.")
   (file nil :read-only t)
   (album nil :read-only t)
   (genres nil :read-only t)
+  (performers nil :read-only t)
   (disc nil :read-only t)
   (date nil :read-only t)
   (id nil :read-only t)
@@ -250,6 +251,10 @@ message from the server.")
 (cl-defmethod libmpdel-genres ((genre libmpdel-genre))
   "Return singleton list GENRE."
   (list genre))
+
+(cl-defmethod libmpdel-performers ((song libmpdel-song))
+  "Return SONG's performers."
+  (libmpdel--song-performers song))
 
 (cl-defgeneric libmpdel-entity-name (entity)
   "Return the name of ENTITY.")
@@ -374,6 +379,12 @@ If the SONG's name is nil, return the filename instead."
     (when (and (stringp pos) (not (string= pos "")))
       (string-to-number pos))))
 
+(defun libmpdel--artists-create (artist-names)
+  "Return a list of artists whose names are ARTIST-NAMES."
+  (mapcar (lambda (name)
+            (libmpdel--artist-create :name name))
+          artist-names))
+
 (defun libmpdel--genres-create (genre-names)
   "Return a list of genres whose names are GENRE-NAMES."
   (mapcar (lambda (name)
@@ -387,6 +398,7 @@ If the SONG's name is nil, return the filename instead."
    :track (cdr (assq 'Track song-data))
    :file (cdr (assq 'file song-data))
    :genres (libmpdel--genres-create (libmpdel-entries song-data 'Genre))
+   :performers (libmpdel--artists-create (libmpdel-entries song-data 'Performer))
    :album (libmpdel--create-album-from-data song-data)
    :date (cdr (assq 'Date song-data))
    :disc (cdr (assq 'Disc song-data))
