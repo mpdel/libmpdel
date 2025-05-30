@@ -173,7 +173,7 @@ message from the server.")
                (:conc-name libmpdel--album-))
   (name nil :read-only t)
   (date nil :read-only t)
-  (artist nil :read-only t))
+  (artists nil :read-only t))
 
 (cl-defstruct (libmpdel-song
                (:constructor libmpdel--song-create)
@@ -214,16 +214,23 @@ message from the server.")
   "Return artist name of ENTITY."
   (libmpdel--artist-name (libmpdel-artist entity)))
 
+(defun libmpdel-artists-name (entity)
+  "Return semicolon separated string of artists names of ENTITY."
+  (string-join (mapcar #'libmpdel--artist-name
+                       (libmpdel-artists entity))
+               "; "))
+
 (cl-defgeneric libmpdel-artist (entity)
-  "Return artist of ENTITY.")
+  "Return artist of ENTITY."
+  (car (libmpdel-artists entity)))
 
-(cl-defmethod libmpdel-artist ((artist libmpdel-artist))
-  "Return ARTIST."
-  artist)
+(cl-defmethod libmpdel-artists ((artist libmpdel-artist))
+  "Return singleton list containing ARTIST."
+  (list artist))
 
-(cl-defmethod libmpdel-artist ((album libmpdel-album))
+(cl-defmethod libmpdel-artists ((album libmpdel-album))
   "Return the ALBUM's artist."
-  (libmpdel--album-artist album))
+  (libmpdel--album-artists album))
 
 (cl-defmethod libmpdel-artist ((song libmpdel-song))
   "Return the SONG's artist."
@@ -414,7 +421,7 @@ If the SONG's name is nil, return the filename instead."
   (libmpdel--album-create
    :name (cdr (assq 'Album album-data))
    :date (cdr (assq 'Date album-data))
-   :artist (libmpdel--artist-create :name (assq 'Artist album-data))))
+   :artists (libmpdel--artists-create (libmpdel-entries album-data 'AlbumArtist))))
 
 (defun libmpdel--create-albums-from-data (data)
   "Return a list of albums from DATA, a server's response."
@@ -983,7 +990,11 @@ If HANDLER is nil, ignore response."
 (cl-defmethod libmpdel-entity-to-criteria ((album libmpdel-album))
   "Return search query matching all songs from ALBUM."
   (format "%s album %S"
-          (libmpdel-entity-to-criteria (libmpdel-artist album))
+          (string-join
+           (mapcar (lambda (artist)
+                     (format "albumartist %S" (libmpdel-entity-name artist)))
+                   (libmpdel-artists album))
+           " ")
           (libmpdel-entity-name album)))
 
 (cl-defmethod libmpdel-entity-to-criteria ((genre libmpdel-genre))
