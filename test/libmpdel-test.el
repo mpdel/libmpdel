@@ -63,7 +63,7 @@
 (ert-deftest libmpdel-test-artist-name ()
   (let* ((artist (libmpdel--artist-create :name "The Artist"))
          (album (libmpdel--album-create :name "The Album" :artists (list artist)))
-         (song (libmpdel--song-create :name "The song" :album album)))
+         (song (libmpdel--song-create :name "The song" :album album :artists (list artist))))
     (should (equal "The Artist" (libmpdel-artist-name artist)))
     (should (equal "The Artist" (libmpdel-artist-name album)))
     (should (equal "The Artist" (libmpdel-artist-name song)))))
@@ -127,6 +127,7 @@
     (should (equal "1970-01-01" (libmpdel-entity-date (libmpdel-album song))))
     (should (equal (list "The Genre") (mapcar #'libmpdel-entity-name (libmpdel-genres song))))
     (should (equal "The Album" (libmpdel-entity-name (libmpdel-album song))))
+    (should (equal "The Artist" (libmpdel-entity-name (libmpdel-artist song))))
     (should (equal "The Albumartist" (libmpdel-entity-name (libmpdel-artist (libmpdel-album song)))))))
 
 (ert-deftest libmpdel-test-current-playlist-p ()
@@ -290,7 +291,7 @@
                  (Artist . "Art")))))
    (libmpdel-test--with-connection
     (libmpdel-playlist-add song 'current-playlist)
-    (should (equal '("findadd albumartist \"Art\" albumartist \"Bart\" album \"A\" title \"S\"")
+    (should (equal '("findadd artist \"Art\" albumartist \"Art\" albumartist \"Bart\" album \"A\" title \"S\"")
                    (last commands))))))
 
 
