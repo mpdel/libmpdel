@@ -181,6 +181,7 @@ message from the server.")
   (file nil :read-only t)
   (album nil :read-only t)
   (performers nil :read-only t)
+  (genres nil :read-only t)
   (disc nil :read-only t)
   (date nil :read-only t)
   (id nil :read-only t)
@@ -189,6 +190,11 @@ message from the server.")
 (cl-defstruct (libmpdel-stored-playlist
                (:constructor libmpdel--stored-playlist-create)
                (:conc-name libmpdel--stored-playlist-))
+  (name nil :read-only t))
+
+(cl-defstruct (libmpdel-genre
+               (:constructor libmpdel--genre-create)
+               (:conc-name libmpdel--genre-))
   (name nil :read-only t))
 
 (cl-defstruct (libmpdel-search-criteria
@@ -240,6 +246,14 @@ message from the server.")
   "Return SONG's performers."
   (libmpdel--song-performers song))
 
+(cl-defmethod libmpdel-genres ((song libmpdel-song))
+  "Return SONG's genres."
+  (libmpdel--song-genres song))
+
+(cl-defmethod libmpdel-genres ((genre libmpdel-genre))
+  "Return singleton list GENRE."
+  (list genre))
+
 (cl-defgeneric libmpdel-entity-name (entity)
   "Return the name of ENTITY.")
 
@@ -250,6 +264,10 @@ message from the server.")
 (cl-defmethod libmpdel-entity-name ((album libmpdel-album))
   "Return ALBUM's name."
   (libmpdel--album-name album))
+
+(cl-defmethod libmpdel-entity-name ((genre libmpdel-genre))
+  "Return GENRE's name."
+  (libmpdel--genre-name genre))
 
 (cl-defmethod libmpdel-entity-name ((song libmpdel-song))
   "Return SONG's name.
@@ -269,6 +287,10 @@ If the SONG's name is nil, return the filename instead."
 (cl-defmethod libmpdel-entity-name ((_entity (eql albums)))
   "Return a string describing the `albums' entity."
   "All albums")
+
+(cl-defmethod libmpdel-entity-name ((_entity (eql genres)))
+  "Return a string describing the `genres' entity."
+  "All genres")
 
 (cl-defmethod libmpdel-entity-name ((_entity (eql current-playlist)))
   "Return a string describing the `current-playlist' entity."
@@ -299,6 +321,10 @@ If the SONG's name is nil, return the filename instead."
 (cl-defmethod libmpdel-entity-parent ((album libmpdel-album))
   "Return ALBUM's artist."
   (libmpdel-artist album))
+
+(cl-defmethod libmpdel-entity-parent ((_genre libmpdel-genre))
+  "Return the `genres' entity."
+  'genres)
 
 (cl-defmethod libmpdel-entity-parent ((_artist libmpdel-artist))
   "Return the `artists' entity."
@@ -350,6 +376,12 @@ If the SONG's name is nil, return the filename instead."
             (libmpdel--artist-create :name name))
           artist-names))
 
+(defun libmpdel--genres-create (genre-names)
+  "Return a list of genres whose names are GENRE-NAMES."
+  (mapcar (lambda (name)
+            (libmpdel--genre-create :name name))
+          genre-names))
+
 (defun libmpdel--create-song-from-data (song-data)
   "Return a song from SONG-DATA, a server's response."
   (libmpdel--song-create
@@ -357,6 +389,7 @@ If the SONG's name is nil, return the filename instead."
    :track (cdr (assq 'Track song-data))
    :file (cdr (assq 'file song-data))
    :performers (libmpdel--artists-create (libmpdel-entries song-data 'Performer))
+   :genres (libmpdel--genres-create (libmpdel-entries song-data 'Genre))
    :album (libmpdel--album-create
            :name (cdr (assq 'Album song-data))
            :artist (libmpdel--artist-create :name (cdr (assq 'Artist song-data))))
@@ -935,6 +968,11 @@ If HANDLER is nil, ignore response."
           (libmpdel-entity-to-criteria (libmpdel-artist album))
           (libmpdel-entity-name album)))
 
+(cl-defmethod libmpdel-entity-to-criteria ((genre libmpdel-genre))
+  "Return search query matching all songs from GENRE."
+  (format "genre %S"
+          (libmpdel-entity-name genre)))
+
 (cl-defmethod libmpdel-entity-to-criteria ((song libmpdel-song))
   "Return search query matching SONG."
   (format "%s title %S"
@@ -970,6 +1008,17 @@ If HANDLER is nil, ignore response."
                  (libmpdel--album-create :name album-name
                                          :artist libmpdel--unknown-artist))
                (libmpdel-sorted-entries data 'Album))))))
+
+(cl-defmethod libmpdel-list ((_entity (eql genres)) function)
+  "Call FUNCTION with all genres as parameter."
+  (libmpdel-send-command
+   "list genre"
+   (lambda (data)
+     (funcall function
+              (mapcar
+               (lambda (genre-name)
+                 (libmpdel--genre-create :name genre-name))
+               (libmpdel-sorted-entries data 'Genre))))))
 
 (cl-defmethod libmpdel-list ((_entity (eql stored-playlists)) function)
   "Call FUNCTION with all stored playlists as parameter."
