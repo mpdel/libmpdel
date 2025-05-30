@@ -184,6 +184,7 @@ message from the server.")
   (album nil :read-only t)
   (performers nil :read-only t)
   (genres nil :read-only t)
+  (artists nil :read-only t)
   (disc nil :read-only t)
   (date nil :read-only t)
   (id nil :read-only t)
@@ -222,7 +223,8 @@ message from the server.")
 
 (cl-defgeneric libmpdel-artist (entity)
   "Return artist of ENTITY."
-  (car (libmpdel-artists entity)))
+  (or (car (libmpdel-artists entity))
+      libmpdel--unknown-artist))
 
 (cl-defmethod libmpdel-artists ((artist libmpdel-artist))
   "Return singleton list containing ARTIST."
@@ -232,9 +234,9 @@ message from the server.")
   "Return the ALBUM's artist."
   (libmpdel--album-artists album))
 
-(cl-defmethod libmpdel-artist ((song libmpdel-song))
-  "Return the SONG's artist."
-  (libmpdel-artist (libmpdel--song-album song)))
+(cl-defmethod libmpdel-artists ((song libmpdel-song))
+  "Return the SONG's artists."
+  (libmpdel--song-artists song))
 
 (defun libmpdel-album-name (entity)
   "Return album name of ENTITY."
@@ -406,6 +408,7 @@ If the SONG's name is nil, return the filename instead."
    :file (cdr (assq 'file song-data))
    :performers (libmpdel--artists-create (libmpdel-entries song-data 'Performer))
    :genres (libmpdel--genres-create (libmpdel-entries song-data 'Genre))
+   :artists (libmpdel--artists-create (libmpdel-entries song-data 'Artist))
    :album (libmpdel--create-album-from-data song-data)
    :date (cdr (assq 'Date song-data))
    :disc (cdr (assq 'Disc song-data))
@@ -1004,7 +1007,12 @@ If HANDLER is nil, ignore response."
 
 (cl-defmethod libmpdel-entity-to-criteria ((song libmpdel-song))
   "Return search query matching SONG."
-  (format "%s title %S"
+  (format "%s %s title %S"
+          (string-join
+           (mapcar (lambda (artist)
+                     (format "artist %S" (libmpdel-entity-name artist)))
+                   (libmpdel-artists song))
+           " ")
           (libmpdel-entity-to-criteria (libmpdel-album song))
           (libmpdel-entity-name song)))
 
