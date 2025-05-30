@@ -45,6 +45,7 @@ The library is implemented around a set of entities.
 | song             | structure | name, album, file, … |                                                         |
 | album            | structure | name, date, artist   |                                                         |
 | artist           | structure | name                 |                                                         |
+| genre            | structure | name                 |                                                         |
 | directory        | structure | name, path           |                                                         |
 | stored-playlist  | structure | name                 | A named user-specified sequence of songs                |
 | search-criteria  | structure | type, what           | Read the [[https://www.musicpd.org/doc/protocol/database.html][protocol documentation]]                         |
@@ -52,6 +53,7 @@ The library is implemented around a set of entities.
 |------------------+-----------+----------------------+---------------------------------------------------------|
 | artists          | symbol    | /none/               | Represent the set of all artists                        |
 | albums           | symbol    | /none/               | Represent the set of all albums                         |
+| genres           | symbol    | /none/               | Represent the set of all genres                         |
 | directories      | symbol    | /none/               | Represent all directories in ~libmpdel-music-directory~ |
 | current-playlist | symbol    | /none/               | Represent the currently played sequence of songs        |
 | stored-playlists | symbol    | /none/               | Represent the set of all stored playlists               |
