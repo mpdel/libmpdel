@@ -4,8 +4,8 @@
 
 ;; Author: Jose A Ortega <jao@gnu.org>
 ;; Keywords: multimedia
-;; Url: https://github.com/mpdel/libmpdel
-;; Package-requires: ((emacs "25.1"))
+;; URL: https://github.com/mpdel/libmpdel
+;; Package-Requires: ((emacs "25.1"))
 ;; Version: 1.2.0
 
 ;; This program is free software; you can redistribute it and/or modify
