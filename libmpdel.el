@@ -685,9 +685,9 @@ directly on the completion candidates (such as embark)."
                                                    (funcall #'libmpdel-entity-name entity)
                                                    'libmpdel-entity entity))
                                  entities)))
-    (cl-mapcar (lambda (entity entity-string)
-                 (puthash entity-string entity map))
-               entities entity-strings)
+    (cl-loop for entity in entities
+             for entity-string in entity-strings
+             do (puthash entity-string entity map))
     (let ((entity-string (completing-read prompt
                                           (lambda (string predicate action)
                                             (if (eq action 'metadata)
