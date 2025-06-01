@@ -1,11 +1,11 @@
 ;;; libmpdel.el --- Communication with an MPD server  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2017-2023  Damien Cassou
+;; Copyright (C) 2017-2025  Damien Cassou
 
 ;; Author: Damien Cassou <damien@cassou.me>
 ;; Keywords: multimedia
-;; Url: https://github.com/mpdel/libmpdel
-;; Package-requires: ((emacs "25.1"))
+;; URL: https://github.com/mpdel/libmpdel
+;; Package-Requires: ((emacs "25.1"))
 ;; Version: 2.0.0
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -685,9 +685,9 @@ directly on the completion candidates (such as embark)."
                                                    (funcall #'libmpdel-entity-name entity)
                                                    'libmpdel-entity entity))
                                  entities)))
-    (cl-mapcar (lambda (entity entity-string)
-                 (puthash entity-string entity map))
-               entities entity-strings)
+    (cl-loop for entity in entities
+             for entity-string in entity-strings
+             do (puthash entity-string entity map))
     (let ((entity-string (completing-read prompt
                                           (lambda (string predicate action)
                                             (if (eq action 'metadata)

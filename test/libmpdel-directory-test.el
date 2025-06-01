@@ -1,10 +1,10 @@
 ;;; libmpdel-directory-test.el --- Tests for libmpdel.el        -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2019-2023  Damien Cassou
+;; Copyright (C) 2019-2025  Damien Cassou
 
 ;; Author: Jose A Ortega <jao@gnu.org>
-;; Url: https://github.com/mpdel/mpdel
-;; Package-requires: ((emacs "25.1"))
+;; URL: https://github.com/mpdel/mpdel
+;; Package-Requires: ((emacs "25.1"))
 ;; Version: 1.2.0
 
 ;; This program is free software; you can redistribute it and/or modify
