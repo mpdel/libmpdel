@@ -1,6 +1,6 @@
 ;;; libmpdel-directory.el --- Handling directories  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2019-2023  Damien Cassou
+;; Copyright (C) 2019-2025  Damien Cassou
 
 ;; Author: Jose A Ortega <jao@gnu.org>
 ;; Keywords: multimedia
