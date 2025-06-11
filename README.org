@@ -43,7 +43,7 @@ The library is implemented around a set of entities.
 | *Name*           | *Type*    | *Fields*             | *Description*                                           |
 |------------------+-----------+----------------------+---------------------------------------------------------|
 | song             | structure | name, album, file, … |                                                         |
-| album            | structure | name, artist         |                                                         |
+| album            | structure | name, date, artist   |                                                         |
 | artist           | structure | name                 |                                                         |
 | genre            | structure | name                 |                                                         |
 | directory        | structure | name, path           |                                                         |
