@@ -33,6 +33,7 @@
 (require 'tq)
 (require 'cl-lib)
 (require 'subr-x)
+(require 'seq)
 
 
 ;;; Customization
@@ -171,7 +172,8 @@ message from the server.")
                (:constructor libmpdel--album-create)
                (:conc-name libmpdel--album-))
   (name nil :read-only t)
-  (artist nil :read-only t))
+  (date nil :read-only t)
+  (artists nil :read-only t))
 
 (cl-defstruct (libmpdel-song
                (:constructor libmpdel--song-create)
@@ -182,6 +184,7 @@ message from the server.")
   (album nil :read-only t)
   (performers nil :read-only t)
   (genres nil :read-only t)
+  (artists nil :read-only t)
   (disc nil :read-only t)
   (date nil :read-only t)
   (id nil :read-only t)
@@ -212,20 +215,28 @@ message from the server.")
   "Return artist name of ENTITY."
   (libmpdel--artist-name (libmpdel-artist entity)))
 
+(defun libmpdel-artists-name (entity)
+  "Return semicolon separated string of artists names of ENTITY."
+  (string-join (mapcar #'libmpdel--artist-name
+                       (libmpdel-artists entity))
+               "; "))
+
 (cl-defgeneric libmpdel-artist (entity)
-  "Return artist of ENTITY.")
+  "Return artist of ENTITY."
+  (or (car (libmpdel-artists entity))
+      libmpdel--unknown-artist))
 
-(cl-defmethod libmpdel-artist ((artist libmpdel-artist))
-  "Return ARTIST."
-  artist)
+(cl-defmethod libmpdel-artists ((artist libmpdel-artist))
+  "Return singleton list containing ARTIST."
+  (list artist))
 
-(cl-defmethod libmpdel-artist ((album libmpdel-album))
+(cl-defmethod libmpdel-artists ((album libmpdel-album))
   "Return the ALBUM's artist."
-  (libmpdel--album-artist album))
+  (libmpdel--album-artists album))
 
-(cl-defmethod libmpdel-artist ((song libmpdel-song))
-  "Return the SONG's artist."
-  (libmpdel-artist (libmpdel--song-album song)))
+(cl-defmethod libmpdel-artists ((song libmpdel-song))
+  "Return the SONG's artists."
+  (libmpdel--song-artists song))
 
 (defun libmpdel-album-name (entity)
   "Return album name of ENTITY."
@@ -352,9 +363,16 @@ If the SONG's name is nil, return the filename instead."
   "Return the track number of SONG within its album."
   (or (libmpdel--song-track song) ""))
 
-(defun libmpdel-entity-date (song)
-  "Return the date of SONG."
-  (or (libmpdel--song-date song) ""))
+(cl-defgeneric libmpdel-entity-date (entity)
+  "Return the date of ENTITY.")
+
+(cl-defmethod libmpdel-entity-date ((album libmpdel-album))
+  "Return ALBUM's date."
+  (libmpdel--album-date album))
+
+(cl-defmethod libmpdel-entity-date ((song libmpdel-song))
+  "Return SONG's date."
+  (libmpdel--song-date song))
 
 (defun libmpdel-song-disc (song)
   "Return the disc number of SONG within its album."
@@ -390,9 +408,8 @@ If the SONG's name is nil, return the filename instead."
    :file (cdr (assq 'file song-data))
    :performers (libmpdel--artists-create (libmpdel-entries song-data 'Performer))
    :genres (libmpdel--genres-create (libmpdel-entries song-data 'Genre))
-   :album (libmpdel--album-create
-           :name (cdr (assq 'Album song-data))
-           :artist (libmpdel--artist-create :name (cdr (assq 'Artist song-data))))
+   :artists (libmpdel--artists-create (libmpdel-entries song-data 'Artist))
+   :album (libmpdel--create-album-from-data song-data)
    :date (cdr (assq 'Date song-data))
    :disc (cdr (assq 'Disc song-data))
    :id (cdr (assq 'Id song-data))
@@ -401,6 +418,17 @@ If the SONG's name is nil, return the filename instead."
 (defun libmpdel--create-songs-from-data (data)
   "Return a list of songs from DATA, a server's response."
   (mapcar #'libmpdel--create-song-from-data (libmpdel-group-data data)))
+
+(defun libmpdel--create-album-from-data (song-data)
+  "Return an album from SONG-DATA, a server's response."
+  (libmpdel--album-create
+   :name (cdr (assq 'Album song-data))
+   :date (cdr (assq 'Date song-data))
+   :artists (libmpdel--artists-create (libmpdel-entries song-data 'AlbumArtist))))
+
+(defun libmpdel--create-albums-from-data (data)
+  "Return a list of albums from DATA, a server's response."
+  (mapcar #'libmpdel--create-album-from-data (libmpdel-group-data data)))
 
 (defun libmpdel-current-playlist-p (entity)
   "Return non-nil if ENTITY is the current playlist."
@@ -965,7 +993,11 @@ If HANDLER is nil, ignore response."
 (cl-defmethod libmpdel-entity-to-criteria ((album libmpdel-album))
   "Return search query matching all songs from ALBUM."
   (format "%s album %S"
-          (libmpdel-entity-to-criteria (libmpdel-artist album))
+          (string-join
+           (mapcar (lambda (artist)
+                     (format "albumartist %S" (libmpdel-entity-name artist)))
+                   (libmpdel-artists album))
+           " ")
           (libmpdel-entity-name album)))
 
 (cl-defmethod libmpdel-entity-to-criteria ((genre libmpdel-genre))
@@ -975,7 +1007,12 @@ If HANDLER is nil, ignore response."
 
 (cl-defmethod libmpdel-entity-to-criteria ((song libmpdel-song))
   "Return search query matching SONG."
-  (format "%s title %S"
+  (format "%s %s title %S"
+          (string-join
+           (mapcar (lambda (artist)
+                     (format "artist %S" (libmpdel-entity-name artist)))
+                   (libmpdel-artists song))
+           " ")
           (libmpdel-entity-to-criteria (libmpdel-album song))
           (libmpdel-entity-name song)))
 
@@ -1003,11 +1040,9 @@ If HANDLER is nil, ignore response."
    "list album"
    (lambda (data)
      (funcall function
-              (mapcar
-               (lambda (album-name)
-                 (libmpdel--album-create :name album-name
-                                         :artist libmpdel--unknown-artist))
-               (libmpdel-sorted-entries data 'Album))))))
+              (seq-uniq
+               (libmpdel--create-albums-from-data data)
+               #'libmpdel-equal)))))
 
 (cl-defmethod libmpdel-list ((_entity (eql genres)) function)
   "Call FUNCTION with all genres as parameter."
@@ -1033,12 +1068,12 @@ If HANDLER is nil, ignore response."
 (cl-defmethod libmpdel-list ((artist libmpdel-artist) function)
   "Call FUNCTION with all albums of ARTIST as parameter."
   (libmpdel-send-command
-   `("list album %s" ,(libmpdel-entity-to-criteria artist))
+   `("find %s sort AlbumSort" ,(libmpdel-entity-to-criteria artist))
    (lambda (data)
      (funcall function
-              (mapcar
-               (lambda (album-name) (libmpdel--album-create :name album-name :artist artist))
-               (libmpdel-sorted-entries data 'Album))))))
+              (seq-uniq
+               (libmpdel--create-albums-from-data data)
+               #'libmpdel-equal)))))
 
 (cl-defgeneric libmpdel-list-songs (entity function)
   "Call FUNCTION with all songs of ENTITY."
